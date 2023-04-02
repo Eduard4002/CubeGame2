@@ -1,0 +1,14 @@
+﻿  main.cpp
+C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\Physics.h(8,40): warning C4305: 'initializing': truncation from 'double' to 'const float'
+C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\main.cpp(15,8): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\main.cpp(42,54): warning C4244: 'argument': conversion from 'int' to 'T', possible loss of data
+          with
+          [
+              T=float
+          ]
+C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\main.cpp(42,40): warning C4244: 'argument': conversion from 'int' to 'T', possible loss of data
+          with
+          [
+              T=float
+          ]
+  IHaveNoNameForThis.vcxproj -> C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\x64\Debug\IHaveNoNameForThis.exe

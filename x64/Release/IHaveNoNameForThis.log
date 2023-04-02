@@ -1,0 +1,17 @@
+﻿  GameManager.cpp
+C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\Physics.h(8,40): warning C4305: 'initializing': truncation from 'double' to 'const float'
+C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\GameManager.cpp(8,51): warning C4244: 'argument': conversion from 'T' to 'T', possible loss of data
+          with
+          [
+              T=unsigned int
+          ]
+          and
+          [
+              T=float
+          ]
+  Generating code
+  2 of 817 functions ( 0.2%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    6 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  IHaveNoNameForThis.vcxproj -> C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\x64\Release\IHaveNoNameForThis.exe
