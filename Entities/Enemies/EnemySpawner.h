@@ -4,10 +4,20 @@
 
 class GameManager;
 enum EnemyType;
+struct EnemySpawnInfo {
+	int type;
+	float minTime;
+	float maxTime;
+};
 class EnemySpawner
 {
 private:
 	std::vector<EnemyType> types;
+	std::vector<EnemySpawnInfo> enemySpawnInfo = {
+	EnemySpawnInfo(0, 0.f, 20.f),
+	EnemySpawnInfo(1, 10.f, 20.f)
+	// Add more enemy types and their time thresholds here
+	};
 
 	int maxAmount = 15;
 	int currAmount = 0;
@@ -16,6 +26,8 @@ private:
 
 	Player* player;
 	sf::RenderWindow* window;
+
+	float totalSurvivalTime;
 public:
 	EnemySpawner(float spawnerTime,Player* player, sf::RenderWindow& window);
 	void Update(float dt);

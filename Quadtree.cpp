@@ -78,7 +78,7 @@ void Quadtree::show(sf::RenderWindow& window)
 	shape.setPosition(boundary.left, boundary.top);
 	shape.setFillColor(sf::Color::Transparent);
 	shape.setOutlineColor(sf::Color::White);
-	shape.setOutlineThickness(0.5f);
+	shape.setOutlineThickness(1.f);
 	window.draw(shape);
 
 	if (northWest != nullptr) {

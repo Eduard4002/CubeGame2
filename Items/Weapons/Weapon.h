@@ -40,7 +40,8 @@ private:
 	//Animations
 	Animation* animationClass;
 private:
-	void setCharacteristic(WeaponType type,int& animX, int& animY,int& shinningX,int& shinningY);
+	void setCharacteristic(WeaponType type,int& animX, int& animY,int& shinningX,int& shinningY, 
+						  std::string& reloadAnimation, std::string& shootAnimation);
 public:
 	Weapon(WeaponType type,sf::Vector2f position, bool playerUsing,sf::RenderWindow& window, unsigned int index);
 	//Weapon(std::string name, sf::Vector2f position,sf::Vector2f weaponOffset,std::string textureFileName, sf::RenderWindow& window, unsigned int index);

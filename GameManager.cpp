@@ -11,18 +11,11 @@ void GameManager::init(sf::RenderWindow& window) {
 	//Entity* object = new Rectangle(sf::Vector2f(50, 50), sf::Vector2f(300, window.getSize().y - 50), window, getNewEntityIndex());
 	entities.push_back(player);
 	//entities.push_back(object);
-	Enemy* enemy = new Enemy(EnemyType_Normal,player, sf::Vector2f(400,playerPos.y), window, getNewEntityIndex());
-	enemies.push_back(enemy);
-	//quadTree = Quadtree(sf::FloatRect(0, 0, 912, 512));
 	
-	spawner = std::make_unique<EnemySpawner>(5.f, player, window);
+	quadTree = Quadtree(sf::FloatRect(0, 0, 912, 512));
+	
+	spawner = std::make_unique<EnemySpawner>(3.f, player, window);
 
-	rec.setFillColor(sf::Color::Transparent);
-	rec.setOutlineColor(sf::Color::Red);
-	rec.setOutlineThickness(2);
-
-	rec.setSize(sf::Vector2f(50, 50));
-	rec.setPosition(sf::Vector2f(400, playerPos.y));
 } 
 void GameManager::HandleEvent(sf::Event evnt) {
 	 if (evnt.type == sf::Event::KeyPressed) {
@@ -49,16 +42,12 @@ void GameManager::Update(float currDelta) {
 	}
 	for (int i = 0; i < bullets.size(); i++) {
 		bullets[i]->Update(currDelta);
-		
-
 	}
 	for (int i = 0; i < enemies.size(); i++) {
 		enemies[i]->Update(currDelta);
-		
 	}
-	//quadTree.insert(Point("Player", player->getGlobalBounds(), -1));
 	//Handle enemy spawning
-	//spawner->Update(currDelta);
+	spawner->Update(currDelta);
 	
 }
 void GameManager::FixedUpdate() {
@@ -80,20 +69,20 @@ void GameManager::FixedUpdate() {
 		Point* p = new Point("Enemy", enemies[i]->getGlobalBounds(),i);
 		quadTree.insert(p);
 	}
+
 	Point* playerPoint = new Point("Player", player->getGlobalBounds(), -1);
 	quadTree.insert(playerPoint);
+
 	for (int i = 0; i < bullets.size(); i++) {
 		std::vector<Point*> points = quadTree.queryRange(bullets[i]->getGlobalBounds());
 		for (int j = 0; j < points.size(); j++) {
 			//We dont want collision detection with bullets and itself
 			if (points[j]->tag != "Bullet") {
 				if (points[j]->tag == "Enemy" && bullets[i]->playerShoot && enemies[points[j]->index]->getGlobalBounds().intersects(bullets[i]->getGlobalBounds())) {
-					std::cout << "Enemy took damage" << std::endl;
 					enemies[points[j]->index]->TakeDamage(bullets[i]->damageAmount);
 					bullets[i]->toRemove = true;
 				}
 				else if (points[j]->tag == "Player" && !bullets[i]->playerShoot && player->getGlobalBounds().intersects(bullets[i]->getGlobalBounds())) {
-					std::cout << "Player took damage" << std::endl;
 					player->TakeDamage(bullets[i]->damageAmount);
 					bullets[i]->toRemove = true;
 				}
@@ -103,56 +92,12 @@ void GameManager::FixedUpdate() {
 			
 		}
 	}
-	/*
-	for (int i = 0; i < enemies.size(); i++) {
-
-		std::vector<Point*> points = quadTree.queryRange(enemies[i]->getGlobalBounds());
-		for (int j = 0; j < points.size(); j++) {
-			//We dont want collision detection with enemies and itself
-			if (points[j]->tag != "Enemy") {
-				if (points[j]->tag == "Bullet" && bullets[points[j]->index]->playerShoot && enemies[i]->getGlobalBounds().intersects(bullets[points[j]->index]->getGlobalBounds())) {
-					std::cout << "Enemy took damage" << std::endl;
-					bullets[points[j]->index]->toRemove = true;
-				}
-				
-				
-			}
-			//collision with player
-			else if (points[j]->index == -1) {
-
-			}
-		}
-	}*/
-	
 	for (int i = 0; i < bullets.size(); i++) {
 		if (bullets[i]->toRemove) { 
 			bullets.erase(bullets.begin() + i);
 		}
 	}
-/*
-	//Checking for bullets colliding with enemies/player
-	for (int i = 0; i < bullets.size();i++) {
-		for (int j = 0; j < enemies.size(); j++) {
-			if (bullets[i]->playerShoot && enemies[j]->getGlobalBounds().intersects(bullets[i]->getGlobalBounds())) {
-				//take damage
-				enemies[j]->TakeDamage(bullets[i]->damageAmount);
-				bullets[i]->toRemove = true;
-			}
-			else if (!bullets[i]->playerShoot && player->getGlobalBounds().intersects(bullets[i]->getGlobalBounds())) {
-				player->TakeDamage(bullets[i]->damageAmount);
-				bullets[i]->toRemove = true;
 
-			}
-			
-		}
-		
-	}
-	for (int i = 0; i < bullets.size(); i++) {
-		if (bullets[i]->toRemove) {
-			bullets.erase(bullets.begin() + i);
-		}
-	}
-	*/
 	//Check for item collision
 	for (auto& item : items) {
 		if (!item->isInInventory && item->isDropped && Physics::isColliding(entities[0]->getGlobalBounds(), item->getPickableZoneBounds())) {

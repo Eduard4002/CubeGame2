@@ -24,7 +24,7 @@ private:
 	std::vector<Enemy*> enemies;
 
 	Quadtree quadTree;
-	bool showQuadTree = true;
+	bool showQuadTree = false;
 	Player* player;
 	unsigned int objectIndex = 1;
 
@@ -39,7 +39,6 @@ private:
 	float currTime = 0.f;
 
 	std::unique_ptr<EnemySpawner> spawner;
-	sf::RectangleShape rec;
 private:
 	GameManager() : quadTree(sf::FloatRect(0,0,912,512)){};
 	GameManager(const GameManager&) = delete;

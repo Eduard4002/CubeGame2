@@ -7,11 +7,11 @@ class GameManager;
 class Weapon;
 class Player;
 enum EnemyType {
-	EnemyType_Easy,
-	EnemyType_Normal,
-	EnemyType_Fast,
-	EnemyType_Tank,
-	EnemyType_Sniper
+	EnemyType_Easy = 0,
+	EnemyType_Normal = 1,
+	EnemyType_Fast = 2,
+	EnemyType_Tank = 3,
+	EnemyType_Sniper = 4
 };
 class Enemy : public Entity
 {
@@ -32,6 +32,7 @@ private:
 	sf::Vector2f playerPos; //Where is player? Updates every "FixedUpdate" call
 
 	sf::Vector2f velocity;
+
 private:
 	void setCharacteristics(EnemyType type,sf::Vector2f pos);
 public:
@@ -43,5 +44,7 @@ public:
 
 	void TakeDamage(int amount);
 	int getHealth();
+
+	void getSpawnThreshold(float& min, float& max);
 };
 

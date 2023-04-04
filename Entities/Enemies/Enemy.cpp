@@ -18,8 +18,8 @@ Enemy::Enemy(EnemyType type, Player* player, sf::Vector2f position, sf::RenderWi
 
 	stopFollowingShape.setFillColor(sf::Color::Transparent);
 	
-	shape.setFillColor(sf::Color::Transparent);
-	shape.setOutlineThickness(2);
+	//shape.setFillColor(sf::Color::Transparent);
+	//shape.setOutlineThickness(2);
 }
 
 void Enemy::FixedUpdate()
@@ -82,7 +82,7 @@ void Enemy::TakeDamage(int amount)
 
 	if (health - amount <= 0) {
 		//Enemy dead 
-		GameManager::getInstance().RemoveEnemy(this->index,this->currWeapon->index);
+		std::cout << "Enemy dead as hell" << std::endl;
 		return;
 	}
 	health -= amount;
@@ -92,6 +92,8 @@ int Enemy::getHealth()
 {
 	return health;
 }
+
+
 
 void Enemy::setCharacteristics(EnemyType type,sf::Vector2f pos)
 {
@@ -104,7 +106,8 @@ void Enemy::setCharacteristics(EnemyType type,sf::Vector2f pos)
 		currWeapon = new Weapon(Weapon_Pistol, pos, false, *window, GameManager::getInstance().getNewEntityIndex());
 		health = 50;
 
-
+		
+		break;
 	case EnemyType_Normal:
 		
 		shape.setFillColor(sf::Color::Cyan);
