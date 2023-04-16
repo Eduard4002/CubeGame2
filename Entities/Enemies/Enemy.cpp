@@ -68,6 +68,7 @@ void Enemy::Update(float dt)
 void Enemy::Render()
 {
 	window->draw(shape);
+	currWeapon->Render();
 	//window->draw(stopFollowingShape);
 	
 }
@@ -82,7 +83,11 @@ void Enemy::TakeDamage(int amount)
 
 	if (health - amount <= 0) {
 		//Enemy dead 
-		std::cout << "Enemy dead as hell" << std::endl;
+		//std::cout << "Enemy dead as hell" << std::endl;
+		//GameManager::getInstance().RemoveEnemy(this->index, this->currWeapon->index);
+		toRemove = true;
+		currWeapon->isDropped = true;
+		GameManager::getInstance().droppedWeapons.push_back(currWeapon);
 		return;
 	}
 	health -= amount;
@@ -120,5 +125,5 @@ void Enemy::setCharacteristics(EnemyType type,sf::Vector2f pos)
 	}
 
 	currWeapon->isUsing = true;
-	GameManager::getInstance().addItem(currWeapon);
+	//GameManager::getInstance().addItem(currWeapon);
 }

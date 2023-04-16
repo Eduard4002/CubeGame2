@@ -9,31 +9,33 @@
 #include "Animation.h"
 #include "Quadtree.h"
 #include "Entities/Enemies/EnemySpawner.h"
-
+#include "UIManager.h"
 class Enemy;
 class Weapon;
 class Item;
 class EnemySpawner;
-
+class UIManager;
 class GameManager
 {
-private:
+public:
 	std::vector<Entity*> entities;
 	std::vector<Item*> items;
 	std::vector<Bullet*> bullets;
 	std::vector<Enemy*> enemies;
-
+	std::vector<Weapon*> droppedWeapons;
+private:
 	Quadtree quadTree;
 	bool showQuadTree = false;
 	Player* player;
+	UIManager* UI;
 	unsigned int objectIndex = 1;
 
 	bool initialized = false;
 	sf::RenderWindow* window;
 
 	sf::Vector2f playerPos;
-	//If we are colliding with a item, the name will be shown here
-	std::string itemName = "";
+	//If we are colliding with a item, the index in the "droppedWeapons" will be shown here
+	int indexWeapon;
 
 	float enemySpawnTimer = 2.f;
 	float currTime = 0.f;
@@ -55,6 +57,7 @@ public:
 	void Render();
 
 	void HandleEvent(sf::Event event);
+	void ShutDown();
 
 	void addEntity(Entity* entity);
 	void addBullet(Bullet* bullet);
@@ -66,6 +69,10 @@ public:
 	int findVecIndex(int bulletID);
 
 	unsigned int getNewEntityIndex();
+
+	void getPlayerHealth(int& currHealth, int& maxHealth);
+	void getPlayerLeftInventory(short& iconX, short& iconY);
+	void getPlayerRightInventory(short& iconX, short& iconY);
 
 };
 

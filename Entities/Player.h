@@ -28,9 +28,17 @@ private:
 	bool movingLeft; //is player moving left
 	bool movingRight;//is player moving right
 
-	Weapon* inventory; //Inventory
+	
 
-	int health = 200;
+	Weapon* usingWeapon;
+	bool usingLeftWeapon;
+public:
+	int health;
+	int maxHealth = 200;
+
+	//Inventory
+	Weapon* leftWeapon;
+	Weapon* rightWeapon;
 public:
 	Player(sf::RenderWindow& window, sf::Vector2f position, unsigned int index);
 	void Update(float deltaTime);
@@ -39,7 +47,7 @@ public:
 	sf::FloatRect getGlobalBounds();
 
 	void outsideOfWindow();
-	void setInventoryItem(Weapon* item);
+	void setInventoryItem(bool left, Weapon* item);
 
 	void TakeDamage(int amount);
 };

@@ -11,17 +11,23 @@ void GameManager::init(sf::RenderWindow& window) {
 	//Entity* object = new Rectangle(sf::Vector2f(50, 50), sf::Vector2f(300, window.getSize().y - 50), window, getNewEntityIndex());
 	entities.push_back(player);
 	//entities.push_back(object);
-	
+	Enemy* enemy = new Enemy(EnemyType_Easy, player, { playerPos.x + 300,playerPos.y }, window, getNewEntityIndex());
+	//enemies.push_back(enemy);
 	quadTree = Quadtree(sf::FloatRect(0, 0, 912, 512));
 	
 	spawner = std::make_unique<EnemySpawner>(3.f, player, window);
 
+	UI = new UIManager(window);
 } 
 void GameManager::HandleEvent(sf::Event evnt) {
 	 if (evnt.type == sf::Event::KeyPressed) {
-		if (evnt.key.code == sf::Keyboard::E && itemName != "") {
+		if (evnt.key.code == sf::Keyboard::F && indexWeapon != -1) {
 			//Pickup the item
-			items.erase(items.begin() + getItemIndexFromName(itemName));
+			//items.erase(items.begin() + getItemIndexFromName(itemName));
+			std::cout << "Added into inventory" << droppedWeapons[indexWeapon]->name<< std::endl;
+			droppedWeapons[indexWeapon]->isDropped = false;
+			player->setInventoryItem(false, droppedWeapons[indexWeapon]);
+			droppedWeapons.erase(droppedWeapons.begin() + indexWeapon);
 		}
 		else if (evnt.key.code == sf::Keyboard::T) {
 			//spawn new item
@@ -30,7 +36,10 @@ void GameManager::HandleEvent(sf::Event evnt) {
 			//Item* item = new Weapon(name, mousePos, sf::Vector2f(10, 10), sf::Vector2f(10, -20), "Weapon/AK-47.png", *window, getNewEntityIndex());
 			//Item* item = new Weapon(Weapon_AK47, mousePos,*window, getNewEntityIndex());
 			//items.push_back(item);
-			
+		}
+		else if (evnt.key.code == sf::Keyboard::Z) {
+			Weapon* w = new Weapon(Weapon_M4, sf::Vector2f(player->getGlobalBounds().left, player->getGlobalBounds().top), true, *window, getNewEntityIndex());
+			player->setInventoryItem(false, w);
 		}
 	 }
 }
@@ -47,8 +56,10 @@ void GameManager::Update(float currDelta) {
 		enemies[i]->Update(currDelta);
 	}
 	//Handle enemy spawning
-	spawner->Update(currDelta);
+	//spawner->Update(currDelta);
 	
+	//Update UI
+	UI->Update(currDelta);
 }
 void GameManager::FixedUpdate() {
 	//Clear the quad tree
@@ -97,10 +108,15 @@ void GameManager::FixedUpdate() {
 			bullets.erase(bullets.begin() + i);
 		}
 	}
-
+	for (int i = 0; i < enemies.size(); i++) {
+		if (enemies[i]->toRemove) {
+			enemies.erase(enemies.begin() + i);
+		}
+	}
 	//Check for item collision
+	/*
 	for (auto& item : items) {
-		if (!item->isInInventory && item->isDropped && Physics::isColliding(entities[0]->getGlobalBounds(), item->getPickableZoneBounds())) {
+		if (!item->isInInventory && item->isDropped && Physics::isColliding(player->getGlobalBounds(), item->getPickableZoneBounds())) {
 			std::cout << "Press E to pickup item: "<<item->name << std::endl;
 			itemName = item->name;
 		}
@@ -108,6 +124,19 @@ void GameManager::FixedUpdate() {
 			itemName = "";
 		}
 		item->FixedUpdate();
+	}*/
+	for (int i = 0; i < droppedWeapons.size(); i++){
+		if (Physics::isColliding(player->getGlobalBounds(), droppedWeapons[i]->getPickableZoneBounds())) {
+			std::cout << "Press F to pickup item: " << droppedWeapons[i]->name << std::endl;
+			indexWeapon = i;
+		}
+		else {
+			indexWeapon = -1;
+		}
+		droppedWeapons[i]->FixedUpdate();
+
+		//TODO Add a function for dropped weapons
+			
 	}
 }
 void GameManager::Render() {
@@ -123,9 +152,13 @@ void GameManager::Render() {
 	for (int i = 0; i < items.size(); i++) {
 		items[i]->Render();
 	}
+	for (int i = 0; i < droppedWeapons.size(); i++) {
+		droppedWeapons[i]->Render();
+	}
 	if (showQuadTree) {
 		quadTree.show(*window);
 	}
+	UI->Render();
 }
 int GameManager::getItemIndexFromName(std::string _name)
 {
@@ -139,6 +172,7 @@ int GameManager::getItemIndexFromName(std::string _name)
 void GameManager::addEntity(Entity* entity) {
 	entities.push_back(entity);
 }
+
 void GameManager::addBullet(Bullet* bullet) { 
 	bullets.push_back(bullet); 
 }
@@ -176,7 +210,25 @@ int GameManager::findVecIndex(int bulletID)
 unsigned int GameManager::getNewEntityIndex() {
 	return objectIndex++;
 }
-
+void GameManager::getPlayerHealth(int& currHealth, int& maxHealth)
+{
+	currHealth = player->health;
+	maxHealth =  player->maxHealth;
+}
+void GameManager::getPlayerLeftInventory(short& iconX, short& iconY) {
+	iconX = player->leftWeapon->iconX;
+	iconY = player->leftWeapon->iconY;
+}
+void GameManager::getPlayerRightInventory(short& iconX, short& iconY) {
+	if (player->rightWeapon != nullptr) {
+		iconX = player->rightWeapon->iconX;
+		iconY = player->rightWeapon->iconY;
+	}
+	
+}
+void GameManager::ShutDown() {
+	UI->ShutDown();
+}
 
 
 

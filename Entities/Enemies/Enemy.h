@@ -32,6 +32,8 @@ private:
 	sf::Vector2f playerPos; //Where is player? Updates every "FixedUpdate" call
 
 	sf::Vector2f velocity;
+public:
+	bool toRemove;
 
 private:
 	void setCharacteristics(EnemyType type,sf::Vector2f pos);

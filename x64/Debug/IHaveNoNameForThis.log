@@ -1,3 +1,13 @@
-﻿  Weapon.cpp
+﻿  UIManager.cpp
 C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\Physics.h(8,40): warning C4305: 'initializing': truncation from 'double' to 'const float'
+C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\UIManager.cpp(57,76): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
+          with
+          [
+              T=unsigned int
+          ]
+C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\UIManager.cpp(57,55): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
+          with
+          [
+              T=unsigned int
+          ]
   IHaveNoNameForThis.vcxproj -> C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\x64\Debug\IHaveNoNameForThis.exe

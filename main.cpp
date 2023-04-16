@@ -8,6 +8,9 @@
 #include "GameManager.h"
 #include "Animation.h"
 #include "Quadtree.h"
+
+#include "IMGUI_SFML/imgui.h"
+#include "IMGUI_SFML/imgui-SFML.h"
 int main() {
 	std::time_t time = std::time(NULL);
 	sf::Texture screenshotTexture;
@@ -21,7 +24,7 @@ int main() {
 	float counterFPS = 0;
 
 	bool useQuadTree = true;
-
+	//912x512
 	sf::RenderWindow window(sf::VideoMode(912, 512), "FPS: ", sf::Style::Close);
 	window.setKeyRepeatEnabled(false);
 
@@ -29,13 +32,12 @@ int main() {
 
 	GameManager& gm = GameManager::getInstance();
     gm.init(window);
-
-
 	while (window.isOpen()) {
 		currDelta = deltaClock.restart().asSeconds();
 		sf::Event evnt;
 		while (window.pollEvent(evnt)) {
-			gm.HandleEvent(evnt);
+			gm.HandleEvent(evnt);	
+			ImGui::SFML::ProcessEvent(window, evnt);
 			if (evnt.type == sf::Event::Closed) {
 				window.close();
 			}
@@ -71,17 +73,15 @@ int main() {
 			FPS = 0;
 			counterFPS = 0;
 		}
-		
 		gm.Update(currDelta);
 		//Update position
-		
+
+
 		window.clear();
-		
-		
-		
 
 		gm.Render();
 		window.display();
 		FPS++;
 	}
+	gm.ShutDown();
 }

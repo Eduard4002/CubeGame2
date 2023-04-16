@@ -104,14 +104,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);PRJPATH="$(ProjectDir)."</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)IHaveNoNameForThis\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\IHaveNoNameForThis\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>D:\Documents\SFML-2.5.1\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>sfml-system-d.lib;sfml-graphics-d.lib;sfml-audio-d.lib;sfml-network-d.lib;sfml-window-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>sfml-system-d.lib;sfml-graphics-d.lib;sfml-audio-d.lib;sfml-network-d.lib;sfml-window-d.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -138,6 +138,12 @@
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="Entities\Enemies\EnemySpawner.cpp" />
     <ClCompile Include="Entities\Enemies\Enemy.cpp" />
+    <ClCompile Include="include\IMGUI_SFML\imgui-SFML.cpp" />
+    <ClCompile Include="include\IMGUI_SFML\imgui.cpp" />
+    <ClCompile Include="include\IMGUI_SFML\imgui_demo.cpp" />
+    <ClCompile Include="include\IMGUI_SFML\imgui_draw.cpp" />
+    <ClCompile Include="include\IMGUI_SFML\imgui_tables.cpp" />
+    <ClCompile Include="include\IMGUI_SFML\imgui_widgets.cpp" />
     <ClCompile Include="Items\Weapons\Bullet.cpp" />
     <ClCompile Include="Entities\Entity.cpp" />
     <ClCompile Include="GameManager.cpp" />
@@ -148,11 +154,21 @@
     <ClCompile Include="Entities\Rectangle.cpp" />
     <ClCompile Include="Items\Weapons\Weapon.cpp" />
     <ClCompile Include="Quadtree.cpp" />
+    <ClCompile Include="UIManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation.h" />
     <ClInclude Include="Entities\Enemies\EnemySpawner.h" />
     <ClInclude Include="Entities\Enemies\Enemy.h" />
+    <ClInclude Include="include\IMGUI_SFML\imconfig-SFML.h" />
+    <ClInclude Include="include\IMGUI_SFML\imconfig.h" />
+    <ClInclude Include="include\IMGUI_SFML\imgui-SFML.h" />
+    <ClInclude Include="include\IMGUI_SFML\imgui-SFML_export.h" />
+    <ClInclude Include="include\IMGUI_SFML\imgui.h" />
+    <ClInclude Include="include\IMGUI_SFML\imgui_internal.h" />
+    <ClInclude Include="include\IMGUI_SFML\imstb_rectpack.h" />
+    <ClInclude Include="include\IMGUI_SFML\imstb_textedit.h" />
+    <ClInclude Include="include\IMGUI_SFML\imstb_truetype.h" />
     <ClInclude Include="Items\Weapons\Bullet.h" />
     <ClInclude Include="Entities\Player.h" />
     <ClInclude Include="Entities\Entity.h" />
@@ -162,6 +178,7 @@
     <ClInclude Include="Entities\Rectangle.h" />
     <ClInclude Include="Items\Weapons\Weapon.h" />
     <ClInclude Include="Quadtree.h" />
+    <ClInclude Include="UIManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

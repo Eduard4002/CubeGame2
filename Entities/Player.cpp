@@ -10,12 +10,11 @@ Player::Player(sf::RenderWindow& window, sf::Vector2f position, unsigned int ind
 
 	this->name = "Player";
 	this->tag = "Player";
+	leftWeapon = new Weapon(Weapon_AK47, position, true, window, GM.getNewEntityIndex());
 
-	Weapon* firstWeapon = new Weapon(Weapon_AK47, position, true,window, GM.getNewEntityIndex());
-	firstWeapon->isUsing = true;
-	firstWeapon->isInInventory = true;
-	inventory = firstWeapon;
-	GM.addItem(firstWeapon);
+	usingWeapon = leftWeapon;
+	//GM.addItem(leftWeapon);
+	health = maxHealth;
 }
 void Player::Update(float deltaTime) {
 	currPos = shape.getPosition();
@@ -37,7 +36,13 @@ void Player::Update(float deltaTime) {
 		isJumping = true;
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::R)) {
-		inventory->Reload();
+		usingWeapon->Reload();
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {
+		usingWeapon = leftWeapon;
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::E) && rightWeapon != nullptr) {
+		usingWeapon = rightWeapon;
 	}
 	//Window barriers
 	if (currPos.y + shapeSize.y > windowSize.y) {
@@ -48,13 +53,13 @@ void Player::Update(float deltaTime) {
 	if (Entity::isOutsideOfWindow(shape.getGlobalBounds())) {
 		outsideOfWindow();
 	}
-	inventory->UpdateWeapon(deltaTime, static_cast<sf::Vector2f>(sf::Mouse::getPosition(*window)), sf::Mouse::isButtonPressed(sf::Mouse::Left));
-
+	usingWeapon->SetPosition(this->shape.getPosition());
+	usingWeapon->UpdateWeapon(deltaTime, static_cast<sf::Vector2f>(sf::Mouse::getPosition(*window)), sf::Mouse::isButtonPressed(sf::Mouse::Left));
 	//inventory->RotateToMouse();
 
 }
 void Player::FixedUpdate() {
-	inventory->SetPosition(currPos);
+	usingWeapon->FixedUpdate();
 
 	if (movingLeft) {
 		velocity.x = -movingSpeed;
@@ -92,6 +97,7 @@ void Player::FixedUpdate() {
 }
 void Player::Render() {
 	window->draw(shape);
+	usingWeapon->Render();
 }
 
 sf::FloatRect Player::getGlobalBounds() {
@@ -102,9 +108,14 @@ void Player::outsideOfWindow() {
 	//std::cout << "Player outside of window" << std::endl;
 }
 
-void Player::setInventoryItem(Weapon* item)
+void Player::setInventoryItem(bool left,Weapon* item)
 {
-	inventory = item;
+	if (left) {
+		this->leftWeapon = item;
+	}
+	else {
+		this->rightWeapon = item;
+	}
 }
 
 void Player::TakeDamage(int damage) {

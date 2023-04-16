@@ -39,9 +39,11 @@ private:
 
 	//Animations
 	Animation* animationClass;
+public:
+	int iconX;
+	int iconY;
 private:
-	void setCharacteristic(WeaponType type,int& animX, int& animY,int& shinningX,int& shinningY, 
-						  std::string& reloadAnimation, std::string& shootAnimation);
+	void setCharacteristic(WeaponType type);
 public:
 	Weapon(WeaponType type,sf::Vector2f position, bool playerUsing,sf::RenderWindow& window, unsigned int index);
 	//Weapon(std::string name, sf::Vector2f position,sf::Vector2f weaponOffset,std::string textureFileName, sf::RenderWindow& window, unsigned int index);
@@ -57,6 +59,8 @@ public:
 
 	//Reload
 	void Reload();
+
+	void Render();
 public:
 	int getAmmoAmount();
 };

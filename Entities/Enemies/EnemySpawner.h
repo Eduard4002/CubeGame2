@@ -15,7 +15,7 @@ private:
 	std::vector<EnemyType> types;
 	std::vector<EnemySpawnInfo> enemySpawnInfo = {
 	EnemySpawnInfo(0, 0.f, 20.f),
-	EnemySpawnInfo(1, 10.f, 20.f)
+	EnemySpawnInfo(1, 5.f, 20.f)
 	// Add more enemy types and their time thresholds here
 	};
 

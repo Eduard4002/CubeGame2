@@ -7,11 +7,8 @@ Weapon::Weapon(std::string name, sf::Vector2f spawnPosition,  sf::Vector2f weapo
 Weapon::Weapon(WeaponType type, sf::Vector2f position, bool playerUsing,sf::RenderWindow& window, unsigned int index) :Item(position, window, index),gm(GameManager::getInstance())
 {
 	this->playerUsing = playerUsing;
-	int animX = 0, animY = 0;
-	int shinningX = 0, shinningY = 0;
-	std::string reloadAnimation;
-	std::string shootAnimation;
-	setCharacteristic(type, animX, animY, shinningX, shinningY,reloadAnimation,shootAnimation);
+	
+	setCharacteristic(type);
 
 	currentAmmo = ammoAmount;
 	this->shape.setOrigin(shape.getSize().x * 0.5f, shape.getSize().y * 0.5f);
@@ -72,7 +69,7 @@ void Weapon::UpdateWeapon(float dt,sf::Vector2f pointTo,bool shouldShoot) {
 	}
 	else if (isDropped) {
 		animationClass->playAnimation(2, dt);
-
+		
 	}
 	
 
@@ -88,11 +85,11 @@ void Weapon::UpdateWeapon(float dt,sf::Vector2f pointTo,bool shouldShoot) {
 	RotateToPoint(pointTo);
 }
 void Weapon::SetPosition(sf::Vector2f position) {
-	if (isUsing) {
+	
 		//std::cout << entityReference.x << std::endl;
-		pickableZone.setPosition(position + weaponOffset);
-		shape.setPosition(position + weaponOffset);
-	}
+	pickableZone.setPosition(position + weaponOffset);
+	shape.setPosition(position + weaponOffset);
+	
 }
 
 
@@ -137,8 +134,8 @@ void Weapon::Reload()
 	isReloading = true;
 }
 
-void Weapon::setCharacteristic(WeaponType type, int& animX, int& animY, int& shinningX, int& shinningY, 
-							  std::string& reloadAnimation, std::string& shootAnimation)
+
+void Weapon::setCharacteristic(WeaponType type)
 {
 	weaponOffset = sf::Vector2f(40, 0);
 	bulletSize = sf::Vector2f(32, 32);
@@ -149,6 +146,9 @@ void Weapon::setCharacteristic(WeaponType type, int& animX, int& animY, int& shi
 		fireRate = 0.2f;
 		reloadTime = 2.f;
 		ammoAmount = 30;
+
+		iconX = 7;
+		iconY = 0;
 		
 		animationClass = new Animation(this->shape, 32, 32);
 		//Shoot animation
@@ -162,12 +162,13 @@ void Weapon::setCharacteristic(WeaponType type, int& animX, int& animY, int& shi
 	case Weapon_M4: 
 		name = "M4_" + std::to_string(index);
 		reloadTime = 1.5f;
-
+		fireRate = 0.1f;
+		ammoAmount = 30;
 		animationClass = new Animation(this->shape, 32, 32);
 		//Shoot animation
-		animationClass->addAnimation("SMG/SMGsAnimations.png", 0, 7, 4, 0.25f, 32);
+		animationClass->addAnimation("SMG/SMGsAnimations.png", 0, 0, 4, 0.25f, 32);
 		//Reload animation
-		animationClass->addAnimation("SMG/ReloadingSMGs.png", 0, 7, 8, reloadTime / 8, 32);
+		animationClass->addAnimation("SMG/ReloadingSMGs.png", 0, 0, 8, reloadTime / 8, 32);
 		//Dropped animation
 		animationClass->addAnimation("GunsShiningSpriteSheet.png", 0, 0, 5, 0.2f, 32 * 7);
 		break;
@@ -213,7 +214,7 @@ void Weapon::setCharacteristic(WeaponType type, int& animX, int& animY, int& shi
 		break;
 	case Weapon_Rocket:
 		name = "Rocket_" + std::to_string(index);
-		shinningY = 3;
+		//shinningY = 3;
 
 		this->shape.setSize(sf::Vector2f(40 * 1.5f, 32));
 		animationClass = new Animation(this->shape, 40, 32);
@@ -229,4 +230,9 @@ void Weapon::setCharacteristic(WeaponType type, int& animX, int& animY, int& shi
 int Weapon::getAmmoAmount()
 {
 	return currentAmmo;
+}
+
+void Weapon::Render()
+{
+	window->draw(this->shape);
 }
