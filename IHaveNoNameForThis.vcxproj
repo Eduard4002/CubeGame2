@@ -136,6 +136,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Animation.cpp" />
+    <ClCompile Include="UI\Animation\ColorAnimation.cpp" />
     <ClCompile Include="Entities\Enemies\EnemySpawner.cpp" />
     <ClCompile Include="Entities\Enemies\Enemy.cpp" />
     <ClCompile Include="include\IMGUI_SFML\imgui-SFML.cpp" />
@@ -153,11 +154,15 @@
     <ClCompile Include="Physics.cpp" />
     <ClCompile Include="Entities\Rectangle.cpp" />
     <ClCompile Include="Items\Weapons\Weapon.cpp" />
+    <ClCompile Include="UI\Animation\PositionAnimation.cpp" />
     <ClCompile Include="Quadtree.cpp" />
-    <ClCompile Include="UIManager.cpp" />
+    <ClCompile Include="UI\UIAnimations.cpp" />
+    <ClCompile Include="UI\UIAnimator.cpp" />
+    <ClCompile Include="UI\UIManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation.h" />
+    <ClInclude Include="UI\Animation\ColorAnimation.h" />
     <ClInclude Include="Entities\Enemies\EnemySpawner.h" />
     <ClInclude Include="Entities\Enemies\Enemy.h" />
     <ClInclude Include="include\IMGUI_SFML\imconfig-SFML.h" />
@@ -177,8 +182,11 @@
     <ClInclude Include="Physics.h" />
     <ClInclude Include="Entities\Rectangle.h" />
     <ClInclude Include="Items\Weapons\Weapon.h" />
+    <ClInclude Include="UI\Animation\PositionAnimation.h" />
     <ClInclude Include="Quadtree.h" />
-    <ClInclude Include="UIManager.h" />
+    <ClInclude Include="UI\UIAnimations.h" />
+    <ClInclude Include="UI\UIAnimator.h" />
+    <ClInclude Include="UI\UIManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

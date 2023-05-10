@@ -13,25 +13,49 @@ private:
 	GameManager& GM;
 	//Variables for moving player
 	sf::Vector2f velocity;
+
 	float movingSpeed;
 	float jumpingSpeed;
+	float dashSpeed;
 
-	sf::Vector2f currPos;//Holds current position, updates every "Update" call
+	sf::Vector2f currPos; //Holds current position, updates every "Update" call
+	sf::Vector2f startPos;//Holds position when restarting the game
 
 	sf::RectangleShape shape;	//Shape
-	sf::Vector2u shapeSize; //Size of the shape
+	sf::Vector2u shapeSize;     //Size of the shape
 
 	//is player jumping?
 	bool isJumping;
-	bool jumped = false;
+	bool jumped;
 	
 	bool movingLeft; //is player moving left
 	bool movingRight;//is player moving right
 
-	
+	//Dashing
+	bool isDashing;
+	bool spawnedDashEffects;
+	bool removedDashEffects;
+
+	bool showEffect = true;
+
+	float removingEffectSpeed;
+	float dashTime;
+	float dashDuration;
 
 	Weapon* usingWeapon;
-	bool usingLeftWeapon;
+	Weapon* defaultWeapon;
+
+	// Other member variables
+	sf::RectangleShape dashEffect1;
+	sf::RectangleShape dashEffect2;
+	sf::RectangleShape dashEffect3;
+
+	// Function to spawn the dash effects
+	void SpawnDashEffects();
+	void RemoveDashEffects();
+
+	//Debugging
+	bool showGameOver = false;
 public:
 	int health;
 	int maxHealth = 200;
@@ -50,5 +74,8 @@ public:
 	void setInventoryItem(bool left, Weapon* item);
 
 	void TakeDamage(int amount);
+	bool holdingLeftWeapon();
+
+	void Reset();
 };
 

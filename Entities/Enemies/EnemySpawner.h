@@ -31,5 +31,6 @@ private:
 public:
 	EnemySpawner(float spawnerTime,Player* player, sf::RenderWindow& window);
 	void Update(float dt);
+	void Reset();
 };
 

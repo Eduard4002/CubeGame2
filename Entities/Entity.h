@@ -19,7 +19,7 @@ public:
 	std::string name;
 	std::string tag;
 	unsigned int index;
-protected:
+public:
 	//Function for checking if a entity is outside of window
 	bool isOutsideOfWindow(sf::FloatRect shape);
 public:

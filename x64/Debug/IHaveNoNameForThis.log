@@ -1,13 +1,90 @@
 ﻿  UIManager.cpp
 C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\Physics.h(8,40): warning C4305: 'initializing': truncation from 'double' to 'const float'
-C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\UIManager.cpp(57,76): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
+C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\UI\UIManager.cpp(108,76): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
           with
           [
               T=unsigned int
           ]
-C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\UIManager.cpp(57,55): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
+C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\UI\UIManager.cpp(108,55): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
           with
           [
               T=unsigned int
+          ]
+C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\UI\UIManager.cpp(154,28): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\UI\UIManager.cpp(188,76): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
+          with
+          [
+              T=unsigned int
+          ]
+C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\UI\UIManager.cpp(188,55): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
+          with
+          [
+              T=unsigned int
+          ]
+C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\UI\UIManager.cpp(249,76): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
+          with
+          [
+              T=unsigned int
+          ]
+C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\UI\UIManager.cpp(249,55): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
+          with
+          [
+              T=unsigned int
+          ]
+C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\UI\UIManager.cpp(276,53): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
+          with
+          [
+              T=unsigned int
+          ]
+C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\UI\UIManager.cpp(281,53): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
+          with
+          [
+              T=unsigned int
+          ]
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\xutility(217,72): warning C4244: 'argument': conversion from '_Ty' to 'float', possible loss of data
+          with
+          [
+              _Ty=int
+          ]
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\xutility(216,16): message : see reference to function template instantiation '_Ty *std::construct_at<_Ty,int,ImVec4,ImVec4,0x0>(_Ty *const ,int &&,ImVec4 &&,ImVec4 &&) noexcept(<expr>)' being compiled
+          with
+          [
+              _Ty=ColorAnimation
+          ]
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\memory(2023,1): message : see reference to function template instantiation 'void std::_Construct_in_place<_Ty,int,ImVec4,ImVec4>(_Ty &,int &&,ImVec4 &&,ImVec4 &&) noexcept(false)' being compiled
+          with
+          [
+              _Ty=ColorAnimation
+          ]
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\memory(2703,36): message : see reference to function template instantiation 'std::_Ref_count_obj2<ColorAnimation>::_Ref_count_obj2<_Ty,ImVec4,ImVec4>(_Ty &&,ImVec4 &&,ImVec4 &&)' being compiled
+          with
+          [
+              _Ty=int
+          ]
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\memory(2704,20): message : see reference to function template instantiation 'std::_Ref_count_obj2<ColorAnimation>::_Ref_count_obj2<_Ty,ImVec4,ImVec4>(_Ty &&,ImVec4 &&,ImVec4 &&)' being compiled
+          with
+          [
+              _Ty=int
+          ]
+C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\UI\UIManager.cpp(52,137): message : see reference to function template instantiation 'std::shared_ptr<ColorAnimation> std::make_shared<ColorAnimation,int,ImVec4,ImVec4>(int &&,ImVec4 &&,ImVec4 &&)' being compiled
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\xutility(231,77): warning C4244: 'argument': conversion from '_Ty' to 'float', possible loss of data
+          with
+          [
+              _Ty=int
+          ]
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\xutility(218,85): warning C4244: 'argument': conversion from '_Ty' to 'float', possible loss of data
+          with
+          [
+              _Ty=int
+          ]
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\xutility(224,49): message : see reference to function template instantiation '_Ty *std::construct_at<_Ty,int,ImVec4,ImVec4,0x0>(_Ty *const ,int &&,ImVec4 &&,ImVec4 &&) noexcept(false)' being compiled
+          with
+          [
+              _Ty=ColorAnimation
+          ]
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\memory(2023,1): message : see reference to function template instantiation 'void std::_Construct_in_place<_Ty,int,ImVec4,ImVec4>(_Ty &,int &&,ImVec4 &&,ImVec4 &&) noexcept(false)' being compiled
+          with
+          [
+              _Ty=ColorAnimation
           ]
   IHaveNoNameForThis.vcxproj -> C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\x64\Debug\IHaveNoNameForThis.exe

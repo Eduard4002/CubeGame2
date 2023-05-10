@@ -1,13 +1,8 @@
 #include <iostream>
 #include <ctime>
 #include "SFML/Graphics.hpp"
-#include "Entities/Player.h"
-#include "Entities/Entity.h"
-#include "Entities/Rectangle.h"
-#include "Items/Item.h"
 #include "GameManager.h"
-#include "Animation.h"
-#include "Quadtree.h"
+#include "Physics.h"
 
 #include "IMGUI_SFML/imgui.h"
 #include "IMGUI_SFML/imgui-SFML.h"
@@ -15,7 +10,6 @@ int main() {
 	std::time_t time = std::time(NULL);
 	sf::Texture screenshotTexture;
 	sf::Clock deltaClock;
-	srand(time);
 	float currDelta = 0;
 	//call Fixed update 50 times per second
 	const float fixedUpdate = 0.02f;
@@ -31,7 +25,7 @@ int main() {
 	screenshotTexture.create(window.getSize().x, window.getSize().y);
 
 	GameManager& gm = GameManager::getInstance();
-    gm.init(window);
+    gm.init(&window);
 	while (window.isOpen()) {
 		currDelta = deltaClock.restart().asSeconds();
 		sf::Event evnt;
@@ -55,12 +49,13 @@ int main() {
 					screenshot.saveToFile(fileName);
 				}
 			}
+			
 		}
 
 		counterFPS += currDelta;
 		fixedDelta += currDelta;
 	
-		if (fixedDelta >= fixedUpdate) {
+		if (fixedDelta >= Physics::FIXED_UPDATE_TIME()) {
 			gm.FixedUpdate();
 			fixedDelta = 0;
 
@@ -74,11 +69,8 @@ int main() {
 			counterFPS = 0;
 		}
 		gm.Update(currDelta);
-		//Update position
-
 
 		window.clear();
-
 		gm.Render();
 		window.display();
 		FPS++;

@@ -6,7 +6,8 @@ private:
 	static constexpr float gravity = 4.f;
 	static constexpr float friction = 1.f;
 	static constexpr float PI = 3.14159265;
-
+	//Divide by 60 because that is how many frames per second we want to call it
+	static constexpr float fixedUpdateTime = 1.f / 60;
 public:
 	//Getters
 	static float GRAVITY() {
@@ -14,6 +15,9 @@ public:
 	}
 	static float FRICTION() {
 		return friction;
+	}
+	static float FIXED_UPDATE_TIME() {
+		return fixedUpdateTime;
 	}
 
 public:

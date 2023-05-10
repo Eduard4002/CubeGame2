@@ -1,24 +1,37 @@
 #include "GameManager.h"
-void GameManager::init(sf::RenderWindow& window) {
+void GameManager::init(sf::RenderWindow* _window = nullptr) {
 	if (initialized) {
 		std::cout << "Already called Gamemanager.init()" << std::endl;
 		exit(-1);
 	}
-	this->window = &window;
-	playerPos = sf::Vector2f(100, window.getSize().y - 50);
-	player = new Player(window,playerPos, getNewEntityIndex());
+	if (_window != nullptr) {
+		this->window = _window;
+	}
+	playerPos = sf::Vector2f(100, window->getSize().y - 50);
+	objectIndex = 1;
+	player = new Player(*window,playerPos, getNewEntityIndex());
+	
 
 	//Entity* object = new Rectangle(sf::Vector2f(50, 50), sf::Vector2f(300, window.getSize().y - 50), window, getNewEntityIndex());
 	entities.push_back(player);
 	//entities.push_back(object);
-	Enemy* enemy = new Enemy(EnemyType_Easy, player, { playerPos.x + 300,playerPos.y }, window, getNewEntityIndex());
+	Enemy* enemy = new Enemy(EnemyType_Easy, player, { playerPos.x + 300,playerPos.y }, *window, getNewEntityIndex());
 	//enemies.push_back(enemy);
 	quadTree = Quadtree(sf::FloatRect(0, 0, 912, 512));
 	
-	spawner = std::make_unique<EnemySpawner>(3.f, player, window);
+	spawner = std::make_unique<EnemySpawner>(3.f, player, *window);
 
-	UI = new UIManager(window);
+	UI = new UIManager(*window);
+
+	//Get random seed
+	std::time_t time = std::time(NULL);
+	srand(time);
+
+	enemySpawnTimer = 2.f;
+
+	
 } 
+
 void GameManager::HandleEvent(sf::Event evnt) {
 	 if (evnt.type == sf::Event::KeyPressed) {
 		if (evnt.key.code == sf::Keyboard::F && indexWeapon != -1) {
@@ -41,10 +54,18 @@ void GameManager::HandleEvent(sf::Event evnt) {
 			Weapon* w = new Weapon(Weapon_M4, sf::Vector2f(player->getGlobalBounds().left, player->getGlobalBounds().top), true, *window, getNewEntityIndex());
 			player->setInventoryItem(false, w);
 		}
+		else if (evnt.key.code == sf::Keyboard::M) {
+			player->TakeDamage(10);
+		}
 	 }
 }
 void GameManager::Update(float currDelta) {
-	
+	//Update UI
+	UI->Update(currDelta);
+
+	if (UI->isPaused()) {
+		return;
+	}
 
 	for (int i = 0; i < entities.size(); i++) {
 		entities[i]->Update(currDelta);
@@ -58,17 +79,22 @@ void GameManager::Update(float currDelta) {
 	//Handle enemy spawning
 	//spawner->Update(currDelta);
 	
-	//Update UI
-	UI->Update(currDelta);
+	
 }
 void GameManager::FixedUpdate() {
+	if (UI->isPaused()) {
+		return;
+	}
 	//Clear the quad tree
 	quadTree.clear();
-	//playerPos = sf::Vector2f(entities[0]->getGlobalBounds().left, entities[0]->getGlobalBounds().top);
+
 	for (int i = 0; i < entities.size(); i++) {
 		entities[i]->FixedUpdate();
 	}
 	for (int i = 0; i < bullets.size(); i++) {
+		if (bullets[i]->isOutsideOfWindow(bullets[i]->getGlobalBounds())) {
+			bullets[i]->toRemove = true;
+		}
 		bullets[i]->FixedUpdate();
 		//Insert a new point into the quad tree with the updated position
 		Point* p = new Point("Bullet", bullets[i]->getGlobalBounds(), i);
@@ -169,6 +195,7 @@ int GameManager::getItemIndexFromName(std::string _name)
 	}
 	return 0;
 }
+
 void GameManager::addEntity(Entity* entity) {
 	entities.push_back(entity);
 }
@@ -215,21 +242,51 @@ void GameManager::getPlayerHealth(int& currHealth, int& maxHealth)
 	currHealth = player->health;
 	maxHealth =  player->maxHealth;
 }
-void GameManager::getPlayerLeftInventory(short& iconX, short& iconY) {
+bool GameManager::getPlayerLeftInventory(short& iconX, short& iconY) {
 	iconX = player->leftWeapon->iconX;
 	iconY = player->leftWeapon->iconY;
+
+	if (player->holdingLeftWeapon()) {
+		return true;
+	}
+	return false;
 }
-void GameManager::getPlayerRightInventory(short& iconX, short& iconY) {
+bool GameManager::getPlayerRightInventory(short& iconX, short& iconY) {
 	if (player->rightWeapon != nullptr) {
 		iconX = player->rightWeapon->iconX;
 		iconY = player->rightWeapon->iconY;
+	}else{
+		iconX = -1;
+		iconY = -1;
 	}
+
+	if (!player->holdingLeftWeapon()) {
+		return true;
+	}
+	return false;
 	
 }
 void GameManager::ShutDown() {
 	UI->ShutDown();
 }
+int GameManager::getRandomInt(int min, int max) {
+	return rand() % (max - min + 1) + min;
+}
+void GameManager::RestartGame() {
+	std::cout << "restart";
+	entities.clear();
+	items.clear();
+	bullets.clear();
+	enemies.clear();
+	droppedWeapons.clear();
 
+	player->Reset();
+	entities.push_back(player);
 
+	spawner->Reset();
+
+	UI->Restart();
+	UI->setPanel(PanelType_MainPanel);
+}
 
 

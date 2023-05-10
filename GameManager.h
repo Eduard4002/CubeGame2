@@ -9,7 +9,7 @@
 #include "Animation.h"
 #include "Quadtree.h"
 #include "Entities/Enemies/EnemySpawner.h"
-#include "UIManager.h"
+#include "UI/UIManager.h"
 class Enemy;
 class Weapon;
 class Item;
@@ -23,22 +23,24 @@ public:
 	std::vector<Bullet*> bullets;
 	std::vector<Enemy*> enemies;
 	std::vector<Weapon*> droppedWeapons;
+
+	UIManager* UI;
+
 private:
 	Quadtree quadTree;
 	bool showQuadTree = false;
 	Player* player;
-	UIManager* UI;
-	unsigned int objectIndex = 1;
+	unsigned int objectIndex;
 
-	bool initialized = false;
+	bool initialized;
 	sf::RenderWindow* window;
 
 	sf::Vector2f playerPos;
 	//If we are colliding with a item, the index in the "droppedWeapons" will be shown here
 	int indexWeapon;
 
-	float enemySpawnTimer = 2.f;
-	float currTime = 0.f;
+	float enemySpawnTimer;
+	float currTime;
 
 	std::unique_ptr<EnemySpawner> spawner;
 private:
@@ -46,12 +48,13 @@ private:
 	GameManager(const GameManager&) = delete;
 	GameManager& operator=(const GameManager&) = delete;
 	int getItemIndexFromName(std::string name);
+
 public:
 	static GameManager& getInstance() {
 		static GameManager instance;
 		return instance;
 	}
-	void init(sf::RenderWindow& window);
+	void init(sf::RenderWindow* window);
 	void Update(float currDelta);
 	void FixedUpdate();
 	void Render();
@@ -71,8 +74,11 @@ public:
 	unsigned int getNewEntityIndex();
 
 	void getPlayerHealth(int& currHealth, int& maxHealth);
-	void getPlayerLeftInventory(short& iconX, short& iconY);
-	void getPlayerRightInventory(short& iconX, short& iconY);
+	bool getPlayerLeftInventory(short& iconX, short& iconY);
+	bool getPlayerRightInventory(short& iconX, short& iconY);
 
+	int getRandomInt(int min, int max);
+
+	void RestartGame();
 };
 

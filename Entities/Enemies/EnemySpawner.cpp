@@ -61,3 +61,8 @@ void EnemySpawner::Update(float dt)
         GameManager::getInstance().addEnemy(enemy);
 	}
 }
+
+void EnemySpawner::Reset()
+{
+    totalSurvivalTime = 0.f;
+}
