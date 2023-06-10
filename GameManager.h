@@ -10,6 +10,7 @@
 #include "Quadtree.h"
 #include "Entities/Enemies/EnemySpawner.h"
 #include "UI/UIManager.h"
+#include "Audio/AudioManager.h"
 class Enemy;
 class Weapon;
 class Item;
@@ -25,6 +26,7 @@ public:
 	std::vector<Weapon*> droppedWeapons;
 
 	UIManager* UI;
+	AudioManager* audio;
 
 private:
 	Quadtree quadTree;
@@ -41,6 +43,8 @@ private:
 
 	float enemySpawnTimer;
 	float currTime;
+
+	short currentScore = 500;
 
 	std::unique_ptr<EnemySpawner> spawner;
 private:
@@ -80,5 +84,8 @@ public:
 	int getRandomInt(int min, int max);
 
 	void RestartGame();
+	void GameOver();
+
+	int getCurrentScore();
 };
 

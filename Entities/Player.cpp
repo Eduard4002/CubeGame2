@@ -12,7 +12,7 @@ Player::Player(sf::RenderWindow& window, sf::Vector2f position, unsigned int ind
 	this->name = "Player";
 	this->tag = "Player";
 	//Default Weapon
-	leftWeapon = new Weapon(Weapon_AK47, position, true, window, GM.getNewEntityIndex());
+	leftWeapon = new Weapon(Weapon_Rocket, position, true, window, GM.getNewEntityIndex());
 	usingWeapon = leftWeapon;
 	defaultWeapon = leftWeapon;
 
@@ -225,9 +225,11 @@ void Player::TakeDamage(int damage) {
 	if (health - damage <= 0) {
 		//Player dead 
 		if (showGameOver) {
+			//GameManager::getInstance().GameOver();
 			GameManager::getInstance().UI->setPanel(PanelType_GameOverPanel);
 		}
 		else {
+			GameManager::getInstance().GameOver();
 			std::cout << "PLAYER IS DEAD" << std::endl;
 			std::cout << "GAME OVER!!!" << std::endl;
 		}

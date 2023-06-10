@@ -38,19 +38,20 @@ UIManager::UIManager(sf::RenderWindow& window)
 	
 	animationSpeed = 60;
 	
-
+	animator = new UIAnimator();
 	// Create a PositionAnimation,values are for testing
 	std::shared_ptr<PositionAnimation> pauseResumePos = std::make_shared<PositionAnimation>(1.f, ImVec2(0, 200), ImVec2(window.getSize().x / 2.f, 200));
-	animator.addAnimation("Pause/Resume", pauseResumePos);
+	animator->addAnimation("Pause/Resume", pauseResumePos, PanelType_PausePanel);
 
 	std::shared_ptr<PositionAnimation> pauseSettingsPos = std::make_shared<PositionAnimation>(1.5f, ImVec2(0, 300), ImVec2(window.getSize().x / 2.f, 300));
-	animator.addAnimation("Pause/Settings", pauseSettingsPos);
+	animator->addAnimation("Pause/Settings", pauseSettingsPos, PanelType_PausePanel);
 
 	std::shared_ptr<PositionAnimation> pauseQuitPos = std::make_shared<PositionAnimation>(2.f, ImVec2(0, 400), ImVec2(window.getSize().x / 2.f, 400));
-	animator.addAnimation("Pause/Quit", pauseQuitPos);
+	animator->addAnimation("Pause/Quit", pauseQuitPos, PanelType_PausePanel);
 
+	/*
 	std::shared_ptr<ColorAnimation> testColAnimation = std::make_shared<ColorAnimation>(2, ImVec4(1.f,1.f,1.f,0.f), ImVec4(1.f,1.f,1.f,1.f));
-	animator.addAnimation("Color", testColAnimation);
+	animator.addAnimation("Color", testColAnimation);*/
 
 }
 void UIManager::Update(float currDelta) {
@@ -66,7 +67,8 @@ void UIManager::Update(float currDelta) {
 	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::G)) {
-		currPanel = PanelType_GameOverPanel;
+		//currPanel = PanelType_GameOverPanel;
+		setPanel(PanelType_GameOverPanel);
 	}
 	
 	//testAnimation.Update(currDelta);
@@ -108,6 +110,7 @@ void UIManager::mainPanel()
 	ImGui::SetWindowSize("Temp", ImVec2(window->getSize().x, window->getSize().y));
 	ImGui::SetWindowPos("Temp", ImVec2(0,0));
 
+	
 	GameManager::getInstance().getPlayerHealth(currPlayerHealth, maxPlayerHealth);
 	bool holdingLeft =  GameManager::getInstance().getPlayerLeftInventory(leftIconX, leftIconY);
 	bool holdingRight = GameManager::getInstance().getPlayerRightInventory(rightIconX, rightIconY);
@@ -173,6 +176,10 @@ void UIManager::mainPanel()
 		ImGui::Image(tex2, sf::Vector2f(64, 64));
 	}
 
+	std::string scoreText = "SCORE: " + std::to_string(GameManager::getInstance().getCurrentScore());
+	ImGui::SetCursorPos(ImVec2(window->getSize().x / 2 - ImGui::CalcTextSize(scoreText.c_str()).x / 2 , 0));
+	ImGui::Text(scoreText.c_str());
+
 	ImGui::End();
 	ImGui::PopStyleColor();
 
@@ -181,8 +188,6 @@ void UIManager::mainPanel()
 void UIManager::pausePanel()
 {
 	ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0, 0, 0, 0.5f));
-	std::shared_ptr<ColorAnimation> color = std::static_pointer_cast<ColorAnimation>(animator.getAnimation("Color"));
-	ImGui::PushStyleColor(ImGuiCol_Text, color->getCurrColor());
 
 	ImGui::Begin("Temp", NULL, defaultWindowFlags);
 	ImGui::SetWindowSize("Temp", ImVec2(window->getSize().x, window->getSize().y));
@@ -203,7 +208,7 @@ void UIManager::pausePanel()
 
 	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 5);
 	// Access the PositionAnimation by its unique identifier
-	std::shared_ptr<PositionAnimation> position = std::static_pointer_cast<PositionAnimation>(animator.getAnimation("Pause/Resume"));
+	std::shared_ptr<PositionAnimation> position = std::static_pointer_cast<PositionAnimation>(animator->getAnimation("Pause/Resume"));
 
 	ImGui::SetCursorPos(ImVec2(position->getCurrPos().x - 250 / 2, position->getCurrPos().y));
 	//Resume button
@@ -213,21 +218,21 @@ void UIManager::pausePanel()
 	}
 
 	// Access the PositionAnimation by its unique identifier
-	position = std::static_pointer_cast<PositionAnimation>(animator.getAnimation("Pause/Settings"));
+	position = std::static_pointer_cast<PositionAnimation>(animator->getAnimation("Pause/Settings"));
 	//Settings button
 	ImGui::SetCursorPos(ImVec2(position->getCurrPos().x - 250 / 2, position->getCurrPos().y));
 	if (ImGui::Button("SETTINGS", ImVec2(250, 75))) {
 		std::cout << "Settings clicked" << std::endl;
 	}
 	// Access the PositionAnimation by its unique identifier
-	position = std::static_pointer_cast<PositionAnimation>(animator.getAnimation("Pause/Quit"));
+	position = std::static_pointer_cast<PositionAnimation>(animator->getAnimation("Pause/Quit"));
 	//Quit button
 	ImGui::SetCursorPos(ImVec2(position->getCurrPos().x - 250 / 2, position->getCurrPos().y));
 	if (ImGui::Button("QUIT", ImVec2(250, 75))) {
 		std::cout << "Quit clicked" << std::endl;
 	}
 
-	animator.Update(currDelta);
+	animator->Update(currPanel,currDelta);
 
 	ImGui::PopFont();
 
@@ -236,7 +241,6 @@ void UIManager::pausePanel()
 	ImGui::PopStyleColor();
 	ImGui::PopStyleVar();
 	ImGui::End();
-	ImGui::PopStyleColor();
 	ImGui::PopStyleColor();
 
 }
@@ -249,20 +253,26 @@ void UIManager::gameOverPanel()
 	ImGui::SetWindowSize("Temp", ImVec2(window->getSize().x, window->getSize().y));
 	ImGui::SetWindowPos("Temp", ImVec2(0, 0));
 
-
 	ImGui::PushFont(title);
 	ImVec2 txtSize = ImGui::CalcTextSize("GAME OVER");
 	ImGui::SetCursorPos(ImVec2(window->getSize().x / 2 - txtSize.x / 2, getPosY(5)));
 	ImGui::Text("GAME OVER");
 	ImGui::PopFont();
+
 	if (!calledGameOver) {
 		survivedTime = timer.restart();
 		calledGameOver = true;
 	}
+
+	ImGui::SetCursorPos(ImVec2(window->getSize().x / 2 - txtSize.x / 2, 150));
+
 	std::string timeText = "You failed in: " + std::to_string((int)floor(survivedTime.asSeconds())) + " seconds...";
+	ImGui::Text(timeText.c_str());
 
 	ImGui::SetCursorPos(ImVec2(window->getSize().x / 2 - txtSize.x / 2, 200));
-	ImGui::Text(timeText.c_str());
+
+	std::string highscoreText = "HIGHSCORE: " + std::to_string(highscore) + " ";
+	ImGui::Text(highscoreText.c_str());
 
 	ImGui::PushFont(button);
 
@@ -308,12 +318,13 @@ float UIManager::getPosX(short percent)
 }
 void UIManager::setPanel(PanelType type) {
 	currPanel = type;
+
 	switch (type) {
 	case PanelType_MainPanel:
 		paused = false;
-		animator.Restart("Pause/Resume");
-		animator.Restart("Pause/Settings");
-		animator.Restart("Pause/Quit");
+		//animator.Restart("Pause/Resume");
+		//animator.Restart("Pause/Settings");
+		//animator.Restart("Pause/Quit");
 
 		mainPanel();
 		break;

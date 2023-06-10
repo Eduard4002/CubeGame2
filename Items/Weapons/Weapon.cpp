@@ -94,6 +94,7 @@ void Weapon::SetPosition(sf::Vector2f position) {
 
 
 void Weapon::Shoot(sf::Vector2f rotateTo) {
+	//gm.audio->playSFX("Testing");
 	//shootAnimation->playAnimation(texture, isShooting);
 	//float rotation = Physics::lookAtMouse(*window, sf::Vector2f(shape.getGlobalBounds().left, shape.getGlobalBounds().top));
 	float rotation = Physics::lookAtPoint(sf::Vector2f(shape.getGlobalBounds().left, shape.getGlobalBounds().top), rotateTo);
@@ -194,13 +195,18 @@ void Weapon::setCharacteristic(WeaponType type)
 
 		animationClass = new Animation(this->shape, 32, 32);
 		//Shoot animation
-		animationClass->addAnimation("Shotgun/ShotgunOnlyAnimations.png", 0, 0, 5, 0.2f, 32);
+		animationClass->addAnimation("Shotgun/ShotgunOnlyAnimations.png", 0, 1, 5, 0.2f, 32);
 		//Reload animation
-		animationClass->addAnimation("Shotgun/ReloadingShotguns.png", 0, 0, 12, reloadTime / 12);
+		animationClass->addAnimation("Shotgun/ReloadingShotguns.png", 0, 1, 8, reloadTime / 12);
 		//Dropped animation
-		animationClass->addAnimation("GunsShiningSpriteSheet.png", 32 * 1, 2, 5, 0.2f, 32 * 4);
+		animationClass->addAnimation("GunsShiningSpriteSheet.png", 32 * 2, 2, 5, 0.2f, 32 * 4);
 		break;
 	case Weapon_Sniper:
+
+		reloadTime = 3.5f;
+		ammoAmount = 1;
+		fireRate = 1.f;
+
 		name = "Sniper_" + std::to_string(index);
 
 		this->shape.setSize(sf::Vector2f(40 * 1.5f, 32));
@@ -215,13 +221,16 @@ void Weapon::setCharacteristic(WeaponType type)
 	case Weapon_Rocket:
 		name = "Rocket_" + std::to_string(index);
 		//shinningY = 3;
+		reloadTime = 3.5f;
+		ammoAmount = 1;
+		fireRate = 1.f;
 
-		this->shape.setSize(sf::Vector2f(40 * 1.5f, 32));
-		animationClass = new Animation(this->shape, 40, 32);
+		this->shape.setSize(sf::Vector2f(64, 32));
+		animationClass = new Animation(this->shape, 64, 32);
 		//Shoot animation
-		animationClass->addAnimation("Other/OtherGunsAnimations.png", 0, 2, 4, 0.25f, 40);
+		animationClass->addAnimation("Other/OtherGunsAnimations.png", 0, 2, 4, 0.25f);
 		//Reload animation
-		animationClass->addAnimation("Other/ReloadingOtherGuns.png", 0, 0, 8, reloadTime / 8, 32);
+		animationClass->addAnimation("Other/ReloadingOtherGuns.png", 0, 2, 7, reloadTime / 7);
 		//Dropped animation
 		animationClass->addAnimation("GunsShiningSpriteSheet.png", 32 * 0, 3, 5, 0.2f, 48 * 3 + 32 * 2);
 		break;

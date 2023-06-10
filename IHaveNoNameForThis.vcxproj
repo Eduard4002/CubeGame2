@@ -136,6 +136,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Animation.cpp" />
+    <ClCompile Include="Audio\AudioManager.cpp" />
+    <ClCompile Include="Audio\Audio.cpp" />
     <ClCompile Include="UI\Animation\ColorAnimation.cpp" />
     <ClCompile Include="Entities\Enemies\EnemySpawner.cpp" />
     <ClCompile Include="Entities\Enemies\Enemy.cpp" />
@@ -162,6 +164,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation.h" />
+    <ClInclude Include="Audio\AudioManager.h" />
+    <ClInclude Include="Audio\Audio.h" />
     <ClInclude Include="UI\Animation\ColorAnimation.h" />
     <ClInclude Include="Entities\Enemies\EnemySpawner.h" />
     <ClInclude Include="Entities\Enemies\Enemy.h" />
@@ -187,6 +191,9 @@
     <ClInclude Include="UI\UIAnimations.h" />
     <ClInclude Include="UI\UIAnimator.h" />
     <ClInclude Include="UI\UIManager.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="save.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

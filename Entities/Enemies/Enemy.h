@@ -24,6 +24,7 @@ private:
 	float speed;
 	float stopFollowing; //how far should the enemy be to stop following and start shooting
 
+
 	Player* playerEntity;
 
 	sf::RectangleShape stopFollowingShape;
@@ -34,6 +35,7 @@ private:
 	sf::Vector2f velocity;
 public:
 	bool toRemove;
+	int score;
 
 private:
 	void setCharacteristics(EnemyType type,sf::Vector2f pos);

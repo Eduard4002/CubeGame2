@@ -1,4 +1,6 @@
 #include "GameManager.h"
+#include <fstream>
+#include <string>
 void GameManager::init(sf::RenderWindow* _window = nullptr) {
 	if (initialized) {
 		std::cout << "Already called Gamemanager.init()" << std::endl;
@@ -22,6 +24,15 @@ void GameManager::init(sf::RenderWindow* _window = nullptr) {
 	spawner = std::make_unique<EnemySpawner>(3.f, player, *window);
 
 	UI = new UIManager(*window);
+	audio = new AudioManager();
+	audio->addSFX("Testing", "res/Audio/SFX/test.wav");
+
+	audio->addMusic("Test", "res/Audio/Music/Without Fear.ogg");
+	audio->addMusic("Test2", "res/Audio/Music/DeathMatch (Boss Theme).ogg");
+
+	//audio->playMusic("Test");
+	
+	audio->setMusicVolume(10);
 
 	//Get random seed
 	std::time_t time = std::time(NULL);
@@ -55,12 +66,13 @@ void GameManager::HandleEvent(sf::Event evnt) {
 			player->setInventoryItem(false, w);
 		}
 		else if (evnt.key.code == sf::Keyboard::M) {
-			player->TakeDamage(10);
+			GameOver();
 		}
 	 }
 }
 void GameManager::Update(float currDelta) {
 	//Update UI
+	//audio->Update();
 	UI->Update(currDelta);
 
 	if (UI->isPaused()) {
@@ -136,6 +148,7 @@ void GameManager::FixedUpdate() {
 	}
 	for (int i = 0; i < enemies.size(); i++) {
 		if (enemies[i]->toRemove) {
+			currentScore += enemies[i]->score;
 			enemies.erase(enemies.begin() + i);
 		}
 	}
@@ -153,7 +166,7 @@ void GameManager::FixedUpdate() {
 	}*/
 	for (int i = 0; i < droppedWeapons.size(); i++){
 		if (Physics::isColliding(player->getGlobalBounds(), droppedWeapons[i]->getPickableZoneBounds())) {
-			std::cout << "Press F to pickup item: " << droppedWeapons[i]->name << std::endl;
+			//std::cout << "Press F to pickup item: " << droppedWeapons[i]->name << std::endl;
 			indexWeapon = i;
 		}
 		else {
@@ -287,6 +300,55 @@ void GameManager::RestartGame() {
 
 	UI->Restart();
 	UI->setPanel(PanelType_MainPanel);
+}
+
+void GameManager::GameOver()
+{
+
+	std::fstream file;
+	file.open("save.txt");
+	std::string line;
+
+	std::getline(file, line);
+	int shiftNum = std::stoi(line);
+	std::getline(file, line);
+	long encHighScore = std::stoi(line);
+
+	//std::cout << "DEC: " << (highScore >> shiftNum) << std::endl;
+	//Delete previous line and insert new highscore
+	if (currentScore >= (encHighScore >> shiftNum)) {
+		std::ofstream temp;
+		temp.open("temp.txt", std::ios::trunc);
+		short shiftNum = getRandomInt(1, 255);
+		
+		while ((currentScore << shiftNum) <= 0 ) {
+			shiftNum = getRandomInt(1, 255);
+		}
+
+		//std::cout << "SHIFT NUM: " << shiftNum << std::endl;
+		//std::cout << "ENC: " << (currentScore << shiftNum) << std::endl;
+		temp << std::to_string(shiftNum) + "\n";
+		temp << std::to_string(currentScore << shiftNum);
+
+		temp.close();
+		file.close();
+		remove("save.txt");
+		
+		if (rename("temp.txt", "save.txt") != 0)
+			std::cout << "Error renaming file \n";
+
+		UI->highscore = currentScore;
+	}
+	else {
+		UI->highscore = (encHighScore >> shiftNum);
+	}
+	
+	UI->currPanel = PanelType_GameOverPanel;
+}
+
+int GameManager::getCurrentScore()
+{
+	return currentScore;
 }
 
 

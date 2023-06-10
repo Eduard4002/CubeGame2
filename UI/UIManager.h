@@ -6,10 +6,11 @@
 #include "SFML/Graphics.hpp"
 #include <iostream>
 #include "../GameManager.h"
+
 #include "UIAnimations.h"
-#include "UIAnimator.h"
 #include "Animation/PositionAnimation.h"
 #include "Animation/ColorAnimation.h"
+
 enum PanelType {
 	PanelType_MainPanel,
 	PanelType_GameOverPanel,
@@ -17,6 +18,9 @@ enum PanelType {
 	PanelType_PausePanel,
 	PanelType_MainMenuPanel
 };
+#include "UIAnimator.h"
+class UIAnimator;
+
 class UIManager
 {
 private:
@@ -25,7 +29,6 @@ private:
 	ImFont* button;
 
 	float currDelta;
-	PanelType currPanel = PanelType_MainPanel;
 	ImGuiWindowFlags defaultWindowFlags;
 	bool paused = false;
 
@@ -52,10 +55,13 @@ private:
 	int animationSpeed;
 	ImVec2 buttonPos;
 
-	UIAnimator animator;
+	UIAnimator* animator;
 
 	ImVec4 healthBarRed;
 	ImVec4 healthBarGreen;
+public:
+	PanelType currPanel = PanelType_MainPanel;
+	int highscore = 0;
 private:
 	void mainPanel();
 	void pausePanel();

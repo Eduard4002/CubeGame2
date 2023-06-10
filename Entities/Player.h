@@ -55,7 +55,7 @@ private:
 	void RemoveDashEffects();
 
 	//Debugging
-	bool showGameOver = false;
+	bool showGameOver = true;
 public:
 	int health;
 	int maxHealth = 200;

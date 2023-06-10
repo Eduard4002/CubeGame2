@@ -111,7 +111,7 @@ void Enemy::setCharacteristics(EnemyType type,sf::Vector2f pos)
 		currWeapon = new Weapon(Weapon_Pistol, pos, false, *window, GameManager::getInstance().getNewEntityIndex());
 		health = 50;
 
-		
+		score = 100;
 		break;
 	case EnemyType_Normal:
 		
@@ -121,6 +121,8 @@ void Enemy::setCharacteristics(EnemyType type,sf::Vector2f pos)
 		currWeapon = new Weapon(Weapon_AK47, pos, false, *window, GameManager::getInstance().getNewEntityIndex());
 
 		health = 100;
+
+		score = 200;
 		break;
 	}
 
