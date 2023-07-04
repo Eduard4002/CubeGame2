@@ -27,6 +27,8 @@ private:
 	//is player jumping?
 	bool isJumping;
 	bool jumped;
+
+	bool _isOnPlatform;
 	
 	bool movingLeft; //is player moving left
 	bool movingRight;//is player moving right
@@ -56,6 +58,8 @@ private:
 
 	//Debugging
 	bool showGameOver = true;
+
+	std::vector<sf::FloatRect> platforms;
 public:
 	int health;
 	int maxHealth = 200;
@@ -64,7 +68,7 @@ public:
 	Weapon* leftWeapon;
 	Weapon* rightWeapon;
 public:
-	Player(sf::RenderWindow& window, sf::Vector2f position, unsigned int index);
+	Player(std::vector<sf::FloatRect> _platforms,sf::RenderWindow& window, sf::Vector2f position, unsigned int index);
 	void Update(float deltaTime);
 	void FixedUpdate();
 	void Render();
@@ -77,5 +81,7 @@ public:
 	bool holdingLeftWeapon();
 
 	void Reset();
+
+	int isOnPlatform();
 };
 

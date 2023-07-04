@@ -1,3 +1,99 @@
-﻿  Weapon.cpp
+﻿  UIManager.cpp
 C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\Physics.h(8,40): warning C4305: 'initializing': truncation from 'double' to 'const float'
+C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\UI\UIManager.cpp(131,76): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
+          with
+          [
+              T=unsigned int
+          ]
+C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\UI\UIManager.cpp(131,55): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
+          with
+          [
+              T=unsigned int
+          ]
+C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\UI\UIManager.cpp(178,28): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\UI\UIManager.cpp(214,76): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
+          with
+          [
+              T=unsigned int
+          ]
+C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\UI\UIManager.cpp(214,55): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
+          with
+          [
+              T=unsigned int
+          ]
+C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\UI\UIManager.cpp(236,53): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
+          with
+          [
+              T=unsigned int
+          ]
+C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\UI\UIManager.cpp(246,53): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
+          with
+          [
+              T=unsigned int
+          ]
+C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\UI\UIManager.cpp(256,53): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
+          with
+          [
+              T=unsigned int
+          ]
+C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\UI\UIManager.cpp(279,76): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
+          with
+          [
+              T=unsigned int
+          ]
+C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\UI\UIManager.cpp(279,55): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
+          with
+          [
+              T=unsigned int
+          ]
+C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\UI\UIManager.cpp(299,53): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
+          with
+          [
+              T=unsigned int
+          ]
+C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\UI\UIManager.cpp(304,53): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
+          with
+          [
+              T=unsigned int
+          ]
+C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\UI\UIManager.cpp(312,53): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
+          with
+          [
+              T=unsigned int
+          ]
+C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\UI\UIManager.cpp(335,76): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
+          with
+          [
+              T=unsigned int
+          ]
+C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\UI\UIManager.cpp(335,55): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
+          with
+          [
+              T=unsigned int
+          ]
+C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\UI\UIManager.cpp(368,53): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
+          with
+          [
+              T=unsigned int
+          ]
+C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\UI\UIManager.cpp(373,53): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
+          with
+          [
+              T=unsigned int
+          ]
+C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\UI\UIManager.cpp(392,76): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
+          with
+          [
+              T=unsigned int
+          ]
+C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\UI\UIManager.cpp(392,55): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
+          with
+          [
+              T=unsigned int
+          ]
+C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\UI\UIManager.cpp(449,53): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
+          with
+          [
+              T=unsigned int
+          ]
   IHaveNoNameForThis.vcxproj -> C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\x64\Debug\IHaveNoNameForThis.exe

@@ -1,4 +1,21 @@
 #include "UIManager.h"
+
+void UIManager::HelpMarker(const char* desc)
+{
+	ImGui::PushFont(slider);
+
+	ImGui::TextDisabled("(?)");
+
+	if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort))
+	{
+		ImGui::BeginTooltip();
+		ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+		ImGui::TextUnformatted(desc);
+		ImGui::PopTextWrapPos();
+		ImGui::EndTooltip();
+	}
+	ImGui::PopFont();
+}
 UIManager::UIManager(sf::RenderWindow& window)
 {
 	this->window = &window;
@@ -11,6 +28,8 @@ UIManager::UIManager(sf::RenderWindow& window)
 	ImGui::GetIO().Fonts->AddFontFromFileTTF("res/Font/ChakraPetch-Medium.ttf", 48);
 	title = ImGui::GetIO().Fonts->AddFontFromFileTTF("res/Font/ChakraPetch-Medium.ttf", 96);
 	button = ImGui::GetIO().Fonts->AddFontFromFileTTF("res/Font/ChakraPetch-Medium.ttf", 64);
+	slider = ImGui::GetIO().Fonts->AddFontFromFileTTF("res/Font/ChakraPetch-Medium.ttf", 32);
+
 
 
 
@@ -61,8 +80,10 @@ void UIManager::Update(float currDelta) {
 	ImGui::SFML::Update(*this->window, time);
 	setPanel(currPanel);
 
+	//ImGui::ShowDemoWindow();
+
 	//If ESC is pressed
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape) && !paused) {
+	if (currPanel != PanelType_MainMenuPanel && sf::Keyboard::isKeyPressed(sf::Keyboard::Escape) && !paused) {
 		currPanel = PanelType_PausePanel;
 	}
 
@@ -210,9 +231,9 @@ void UIManager::pausePanel()
 	// Access the PositionAnimation by its unique identifier
 	std::shared_ptr<PositionAnimation> position = std::static_pointer_cast<PositionAnimation>(animator->getAnimation("Pause/Resume"));
 
-	ImGui::SetCursorPos(ImVec2(position->getCurrPos().x - 250 / 2, position->getCurrPos().y));
+	//ImGui::SetCursorPos(ImVec2(position->getCurrPos().x - 250 / 2, position->getCurrPos().y));
 	//Resume button
-	//ImGui::SetCursorPos(ImVec2(window->getSize().x - 250 / 2, 200));
+	ImGui::SetCursorPos(ImVec2(window->getSize().x / 2 - 250 / 2, 150));
 	if (ImGui::Button("RESUME", ImVec2(250, 75))) {
 		currPanel = PanelType_MainPanel;
 	}
@@ -220,16 +241,22 @@ void UIManager::pausePanel()
 	// Access the PositionAnimation by its unique identifier
 	position = std::static_pointer_cast<PositionAnimation>(animator->getAnimation("Pause/Settings"));
 	//Settings button
-	ImGui::SetCursorPos(ImVec2(position->getCurrPos().x - 250 / 2, position->getCurrPos().y));
+	//ImGui::SetCursorPos(ImVec2(position->getCurrPos().x - 250 / 2, position->getCurrPos().y));
+
+	ImGui::SetCursorPos(ImVec2(window->getSize().x / 2 - 250 / 2 , 250));
+
 	if (ImGui::Button("SETTINGS", ImVec2(250, 75))) {
-		std::cout << "Settings clicked" << std::endl;
+		setPanel(PanelType_SettingPanel);
 	}
 	// Access the PositionAnimation by its unique identifier
 	position = std::static_pointer_cast<PositionAnimation>(animator->getAnimation("Pause/Quit"));
 	//Quit button
-	ImGui::SetCursorPos(ImVec2(position->getCurrPos().x - 250 / 2, position->getCurrPos().y));
-	if (ImGui::Button("QUIT", ImVec2(250, 75))) {
-		std::cout << "Quit clicked" << std::endl;
+	//ImGui::SetCursorPos(ImVec2(position->getCurrPos().x - 250 / 2, position->getCurrPos().y));
+
+	ImGui::SetCursorPos(ImVec2(window->getSize().x / 2 - 300 / 2, 350));
+
+	if (ImGui::Button("MAIN MENU", ImVec2(300, 75))) {
+		setPanel(PanelType_MainMenuPanel);
 	}
 
 	animator->Update(currPanel,currDelta);
@@ -244,7 +271,62 @@ void UIManager::pausePanel()
 	ImGui::PopStyleColor();
 
 }
+void UIManager::mainMenuPanel()
+{
+	ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0, 0, 0, 1.f));
 
+	ImGui::Begin("Temp", NULL, defaultWindowFlags);
+	ImGui::SetWindowSize("Temp", ImVec2(window->getSize().x, window->getSize().y));
+	ImGui::SetWindowPos("Temp", ImVec2(0, 0));
+
+	ImGui::PushFont(title);
+	ImVec2 txtSize = ImGui::CalcTextSize("MAIN MENU");
+
+	ImGui::SetCursorPos(ImVec2(window->getSize().x / 2 - txtSize.x / 2, 20));
+	ImGui::Text("MAIN MENU");
+	ImGui::PopFont();
+
+	ImGui::PushFont(button);
+
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4((float)76 / 255, (float)86 / 255, (float)106 / 255, 1));
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4((float)59 / 255, (float)66 / 255, (float)82 / 255, 1));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4((float)46 / 255, (float)52 / 255, (float)64 / 255, 1));
+
+	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 5);
+
+
+	//Resume button
+	ImGui::SetCursorPos(ImVec2(window->getSize().x / 2 - 250 / 2, 150));
+	if (ImGui::Button("START", ImVec2(250, 75))) {
+		GameManager::getInstance().startGame();
+	}
+
+	ImGui::SetCursorPos(ImVec2(window->getSize().x / 2 - 250 / 2, 250));
+
+	if (ImGui::Button("CREDITS", ImVec2(250, 75))) {
+		setPanel(PanelType_CreditsPanel);
+	}
+
+	//Quit button
+
+	ImGui::SetCursorPos(ImVec2(window->getSize().x / 2 - 250 / 2, 350));
+
+	if (ImGui::Button("QUIT", ImVec2(250, 75))) {
+		std::cout << "Quit clicked" << std::endl;
+	}
+	ImGui::PopFont();
+
+	ImGui::PopStyleColor();
+	ImGui::PopStyleColor();
+	ImGui::PopStyleColor();
+	ImGui::PopStyleVar();
+	ImGui::End();
+	ImGui::PopStyleColor();
+
+}
+void UIManager::creditsPanel()
+{
+}
 void UIManager::gameOverPanel()
 {
 	ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0, 0, 0, 1.f));
@@ -302,6 +384,101 @@ void UIManager::gameOverPanel()
 	ImGui::End();
 	ImGui::PopStyleColor();
 }
+void UIManager::settingsPanel()
+{
+	ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0, 0, 0, 0.5f));
+
+	ImGui::Begin("Temp", NULL, defaultWindowFlags);
+	ImGui::SetWindowSize("Temp", ImVec2(window->getSize().x, window->getSize().y));
+	ImGui::SetWindowPos("Temp", ImVec2(0, 0));
+
+	//Start Title
+	ImGui::PushFont(title);
+	ImVec2 txtSize = ImGui::CalcTextSize("SETTINGS");
+	ImGui::SetCursorPos(ImVec2(window->getSize().x / 2 - txtSize.x / 2, getPosY(5)));
+	ImGui::Text("SETTINGS");
+	ImGui::PopFont();
+	//End title
+	//Start Music/SFX
+
+	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 10);
+	/*
+	ImGui::PushStyleColor(ImGuiCol_FrameBg,        ImVec4((float)135 / 255, (float)135 / 255, (float)135 / 255, 1));
+	ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4((float)64 / 255, (float)65 / 255, (float)66 / 255, 1));
+	ImGui::PushStyleColor(ImGuiCol_FrameBgActive,  ImVec4((float)39 / 255, (float)39 / 255, (float)41 / 255, 1));*/
+
+	ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4((float)76 / 255, (float)86 / 255, (float)106 / 255, 1));
+	ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4((float)59 / 255, (float)66 / 255, (float)82 / 255, 1));
+	ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4((float)46 / 255, (float)52 / 255, (float)64 / 255, 1));
+
+
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4((float)76 / 255, (float)86 / 255, (float)106 / 255, 1));
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4((float)59 / 255, (float)66 / 255, (float)82 / 255, 1));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4((float)46 / 255, (float)52 / 255, (float)64 / 255, 1));
+
+	float width = ImGui::GetWindowWidth() * 0.3f;
+	ImGui::PushItemWidth(width);
+
+	ImGui::SetCursorPos(ImVec2(window->getSize().x / 2 - width / 2 , getPosY(30)));
+	ImGui::DragInt("MUSIC", &currMusicVol, 0.2f,0,100);
+	ImGui::SameLine(); HelpMarker(
+		"Click and drag to edit value.\n"
+		"Hold SHIFT/ALT for faster/slower edit.\n"
+		"Double-click or CTRL+click to input value.");
+	ImGui::SetCursorPos(ImVec2(window->getSize().x / 2 - width / 2, getPosY(45)));
+
+	ImGui::DragInt("SFX", &currSFXVol, 0.2f, 0, 100);
+	ImGui::SameLine(); HelpMarker(
+		"Click and drag to edit value.\n"
+		"Hold SHIFT/ALT for faster/slower edit.\n"
+		"Double-click or CTRL+click to input value.");
+
+	
+
+	//End Music/SFX
+	//Start Checkbox
+	ImGui::PushStyleColor(ImGuiCol_CheckMark, ImVec4((float)39 / 255, (float)39 / 255, (float)41 / 255, 1));
+	
+	ImGui::PushItemWidth(width);
+
+	ImGui::SetCursorPos(ImVec2(window->getSize().x / 2 - width / 2 + 50, getPosY(60)));
+
+
+	ImGui::Checkbox("V-Sync", &vSync);
+
+	ImGui::SetCursorPos(ImVec2(window->getSize().x / 2 - 125, getPosY(80)));
+	if (ImGui::Button("BACK", ImVec2(250, 75))) {
+		setPanel(PanelType_PausePanel);
+	}
+
+	//Change respective values
+	if (prevMusicVol != currMusicVol) {
+		GameManager::getInstance().audio->setMusicVolume(currMusicVol);
+		prevMusicVol = currMusicVol;
+	}
+	if (prevSFXVol != currSFXVol) {
+		GameManager::getInstance().audio->setSFXVolume(currSFXVol);
+		prevSFXVol = currSFXVol;
+	}
+	if (prevVSync != vSync) {
+		GameManager::getInstance().setVSync(vSync);
+		prevVSync = vSync;
+	}
+	ImGui::PopStyleColor();
+	ImGui::PopStyleVar();
+
+	ImGui::PopStyleColor();
+	ImGui::PopStyleColor();
+	ImGui::PopStyleColor();
+
+	ImGui::PopStyleColor();
+	ImGui::PopStyleColor();
+	ImGui::PopStyleColor();
+
+	ImGui::End();
+	ImGui::PopStyleColor();
+}
+
 bool UIManager::isPaused() {
 	return paused;
 }
@@ -335,6 +512,16 @@ void UIManager::setPanel(PanelType type) {
 	case PanelType_GameOverPanel:
 		paused = true;
 		gameOverPanel();
+		break;
+	case PanelType_SettingPanel:
+		paused = true;
+		settingsPanel();
+		break;
+	case PanelType_MainMenuPanel:
+		mainMenuPanel();
+		break;
+	case PanelType_CreditsPanel:
+		creditsPanel();
 		break;
 	}
 }

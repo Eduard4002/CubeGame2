@@ -9,13 +9,11 @@ void GameManager::init(sf::RenderWindow* _window = nullptr) {
 	if (_window != nullptr) {
 		this->window = _window;
 	}
-	playerPos = sf::Vector2f(100, window->getSize().y - 50);
+	playerPos = sf::Vector2f(100, window->getSize().y - 200);
 	objectIndex = 1;
-	player = new Player(*window,playerPos, getNewEntityIndex());
 	
 
-	//Entity* object = new Rectangle(sf::Vector2f(50, 50), sf::Vector2f(300, window.getSize().y - 50), window, getNewEntityIndex());
-	entities.push_back(player);
+	
 	//entities.push_back(object);
 	Enemy* enemy = new Enemy(EnemyType_Easy, player, { playerPos.x + 300,playerPos.y }, *window, getNewEntityIndex());
 	//enemies.push_back(enemy);
@@ -24,6 +22,7 @@ void GameManager::init(sf::RenderWindow* _window = nullptr) {
 	spawner = std::make_unique<EnemySpawner>(3.f, player, *window);
 
 	UI = new UIManager(*window);
+
 	audio = new AudioManager();
 	audio->addSFX("Testing", "res/Audio/SFX/test.wav");
 
@@ -40,9 +39,94 @@ void GameManager::init(sf::RenderWindow* _window = nullptr) {
 
 	enemySpawnTimer = 2.f;
 
-	
-} 
+	background = new ParallaxEffect(5);
+	background->addLayer("res/city 1/1.png", 0.4f, playerPos);
+	background->addLayer("res/city 1/2.png", 0.3f, playerPos);
+	background->addLayer("res/city 1/3.png", 0.2f, playerPos);
+	background->addLayer("res/city 1/4.png", 0.1f, playerPos);
+	background->addLayer("res/city 1/5.png", 0.0f, playerPos);
 
+
+
+	//Add platform
+	sf::FloatRect firstPlatform(sf::Vector2f(0, window->getSize().y - (16 * 3)), sf::Vector2f(16 * (window->getSize().x / 16), 16 * 3));
+	//sf::FloatRect secondPlatform(sf::Vector2f(16 * 35, window->getSize().y - (16 * 3)), sf::Vector2f(16 * 23, 16 * 3));
+
+	AddPlatform(sf::Vector2f(firstPlatform.left,  firstPlatform.top),  sf::Vector2f(firstPlatform.width,  firstPlatform.height));
+	//AddPlatform(sf::Vector2f(secondPlatform.left, secondPlatform.top), sf::Vector2f(secondPlatform.width, secondPlatform.height));
+
+	
+	std::vector<sf::FloatRect> platforms;
+	platforms.push_back(firstPlatform);
+	//platforms.push_back(secondPlatform);
+
+	player = new Player(platforms,*window, playerPos, getNewEntityIndex());
+
+	//Entity* object = new Platform(sf::Vector2f(50, 50), sf::Vector2f(300, window.getSize().y - 50), window, getNewEntityIndex());
+	entities.push_back(player);
+
+} 
+void GameManager::AddPlatform(sf::Vector2f startPos,sf::Vector2f size) {
+
+
+	int countX = size.x / 16;
+	int countY = size.y / 16;
+	for (int i = 0; i <= countY-1; i++) {
+		Platform* tile = new Platform(sf::Vector2f(startPos.x , startPos.y + (16 * i)), *window, getNewEntityIndex());
+		if (i == countY - 1) {
+			tile->addTexture("res/steelPlatform/row-5-column-1.png");
+		}
+		else {
+			tile->addTexture("res/steelPlatform/row-3-column-1.png");
+		}
+		platformTiles.push_back(tile);
+
+		for (int j = 1; j <= countX - 2; j++) {
+			Platform* tile = new Platform(sf::Vector2f(startPos.x + (16 * j), startPos.y + (16 * i)), *window, getNewEntityIndex());
+			if (i == 0) {
+				tile->addTexture("res/steelPlatform/row-1-column-3.png");
+			}
+			else if (i > 0 && i < countY - 1) {
+				tile->addTexture("res/steelPlatform/row-3-column-3.png");
+			}
+			else if (i == countY - 1) {
+				tile->addTexture("res/steelPlatform/row-5-column-3.png");
+
+			}
+			platformTiles.push_back(tile);
+		}
+	}
+	
+	
+	Platform* startTile = new Platform(startPos, *window, getNewEntityIndex());
+	startTile->addTexture("res/steelPlatform/row-1-column-1.png");
+	platformTiles.push_back(startTile);
+
+	if (size.y > 16) {
+		for (int i = 0; i < countY; i++) {
+			Platform* endTile = new Platform(sf::Vector2f(startPos.x + size.x - 16, startPos.y + (16 * i)), *window, getNewEntityIndex());
+			if (i == 0) {
+				endTile->addTexture("res/steelPlatform/row-1-column-5.png");
+			}
+			else if (i > 0 && i < countY -1) {
+				endTile->addTexture("res/steelPlatform/row-3-column-5.png");
+			}
+			else if (i == countY-1) {
+				endTile->addTexture("res/steelPlatform/row-5-column-5.png");
+			}
+			platformTiles.push_back(endTile);
+
+		}
+	}
+	/*
+	if (size.x > 16) {
+		Platform* endTile = new Platform(sf::Vector2f(startPos.x + (size.x-16), startPos.y), *window, getNewEntityIndex());
+		endTile->addTexture("res/steelPlatform/row-1-column-5.png");
+		platforms.push_back(endTile);
+
+	}*/
+
+}
 void GameManager::HandleEvent(sf::Event evnt) {
 	 if (evnt.type == sf::Event::KeyPressed) {
 		if (evnt.key.code == sf::Keyboard::F && indexWeapon != -1) {
@@ -75,10 +159,12 @@ void GameManager::Update(float currDelta) {
 	//audio->Update();
 	UI->Update(currDelta);
 
+	if (!gameStarted) return;
+
 	if (UI->isPaused()) {
 		return;
 	}
-
+	background->Update(sf::Vector2f(player->getGlobalBounds().left, player->getGlobalBounds().top));
 	for (int i = 0; i < entities.size(); i++) {
 		entities[i]->Update(currDelta);
 	}
@@ -94,6 +180,8 @@ void GameManager::Update(float currDelta) {
 	
 }
 void GameManager::FixedUpdate() {
+	
+	if (!gameStarted) return;
 	if (UI->isPaused()) {
 		return;
 	}
@@ -152,6 +240,8 @@ void GameManager::FixedUpdate() {
 			enemies.erase(enemies.begin() + i);
 		}
 	}
+
+	
 	//Check for item collision
 	/*
 	for (auto& item : items) {
@@ -178,7 +268,18 @@ void GameManager::FixedUpdate() {
 			
 	}
 }
+
 void GameManager::Render() {
+	if (onMainMenu) {
+		UI->Render();
+	}
+
+	if (!gameStarted) return;
+
+	background->Render(*window);
+	for (int i = 0; i < platformTiles.size(); i++) {
+		platformTiles[i]->Render();
+	}
 	for (int i = 0; i < entities.size(); i++) {
 		entities[i]->Render();
 	}
@@ -194,10 +295,13 @@ void GameManager::Render() {
 	for (int i = 0; i < droppedWeapons.size(); i++) {
 		droppedWeapons[i]->Render();
 	}
+	
 	if (showQuadTree) {
 		quadTree.show(*window);
 	}
-	UI->Render();
+	if (!onMainMenu) {
+		UI->Render();
+	}
 }
 int GameManager::getItemIndexFromName(std::string _name)
 {
@@ -350,5 +454,19 @@ int GameManager::getCurrentScore()
 {
 	return currentScore;
 }
+
+void GameManager::setVSync(bool set)
+{
+	window->setVerticalSyncEnabled(set);
+}
+
+void GameManager::startGame()
+{
+	gameStarted = true;
+	onMainMenu = false;
+	UI->setPanel(PanelType_MainPanel);
+}
+
+
 
 

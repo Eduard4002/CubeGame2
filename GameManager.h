@@ -2,7 +2,6 @@
 #include "SFML/Graphics.hpp"
 #include "Entities/Entity.h"
 #include "Entities/Player.h"
-#include "Entities/Rectangle.h"
 #include "Entities/Enemies/Enemy.h"
 #include "Items/Weapons/Weapon.h"
 #include "Items/Item.h"
@@ -11,6 +10,9 @@
 #include "Entities/Enemies/EnemySpawner.h"
 #include "UI/UIManager.h"
 #include "Audio/AudioManager.h"
+#include "ParallaxEffect.h"
+#include "Entities/Platform.h"
+
 class Enemy;
 class Weapon;
 class Item;
@@ -24,7 +26,8 @@ public:
 	std::vector<Bullet*> bullets;
 	std::vector<Enemy*> enemies;
 	std::vector<Weapon*> droppedWeapons;
-
+	std::vector<Platform*> platformTiles;
+	
 	UIManager* UI;
 	AudioManager* audio;
 
@@ -47,6 +50,11 @@ private:
 	short currentScore = 500;
 
 	std::unique_ptr<EnemySpawner> spawner;
+
+	ParallaxEffect* background;
+
+	bool gameStarted = false;
+	bool onMainMenu = true;
 private:
 	GameManager() : quadTree(sf::FloatRect(0,0,912,512)){};
 	GameManager(const GameManager&) = delete;
@@ -62,6 +70,8 @@ public:
 	void Update(float currDelta);
 	void FixedUpdate();
 	void Render();
+
+	void AddPlatform(sf::Vector2f position, sf::Vector2f size);
 
 	void HandleEvent(sf::Event event);
 	void ShutDown();
@@ -87,5 +97,9 @@ public:
 	void GameOver();
 
 	int getCurrentScore();
+
+	void setVSync(bool set);
+
+	void startGame();
 };
 

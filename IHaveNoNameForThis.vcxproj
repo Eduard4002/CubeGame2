@@ -138,6 +138,8 @@
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="Audio\AudioManager.cpp" />
     <ClCompile Include="Audio\Audio.cpp" />
+    <ClCompile Include="Collider.cpp" />
+    <ClCompile Include="ParallaxEffect.cpp" />
     <ClCompile Include="UI\Animation\ColorAnimation.cpp" />
     <ClCompile Include="Entities\Enemies\EnemySpawner.cpp" />
     <ClCompile Include="Entities\Enemies\Enemy.cpp" />
@@ -154,7 +156,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Entities\Player.cpp" />
     <ClCompile Include="Physics.cpp" />
-    <ClCompile Include="Entities\Rectangle.cpp" />
+    <ClCompile Include="Entities\Platform.cpp" />
     <ClCompile Include="Items\Weapons\Weapon.cpp" />
     <ClCompile Include="UI\Animation\PositionAnimation.cpp" />
     <ClCompile Include="Quadtree.cpp" />
@@ -166,6 +168,8 @@
     <ClInclude Include="Animation.h" />
     <ClInclude Include="Audio\AudioManager.h" />
     <ClInclude Include="Audio\Audio.h" />
+    <ClInclude Include="Collider.h" />
+    <ClInclude Include="ParallaxEffect.h" />
     <ClInclude Include="UI\Animation\ColorAnimation.h" />
     <ClInclude Include="Entities\Enemies\EnemySpawner.h" />
     <ClInclude Include="Entities\Enemies\Enemy.h" />
@@ -184,7 +188,7 @@
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="Items\Item.h" />
     <ClInclude Include="Physics.h" />
-    <ClInclude Include="Entities\Rectangle.h" />
+    <ClInclude Include="Entities\Platform.h" />
     <ClInclude Include="Items\Weapons\Weapon.h" />
     <ClInclude Include="UI\Animation\PositionAnimation.h" />
     <ClInclude Include="Quadtree.h" />

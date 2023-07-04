@@ -1,5 +1,5 @@
 #include "Player.h"
-Player::Player(sf::RenderWindow& window, sf::Vector2f position, unsigned int index) : Entity(window, index),GM(GameManager::getInstance()){
+Player::Player(std::vector<sf::FloatRect> _platforms,sf::RenderWindow& window, sf::Vector2f position, unsigned int index) : Entity(window, index),GM(GameManager::getInstance()){
 	this->velocity = sf::Vector2f(0.f, 0.f);
 	this->movingSpeed = 15;
 	this->jumpingSpeed = 40;
@@ -12,7 +12,7 @@ Player::Player(sf::RenderWindow& window, sf::Vector2f position, unsigned int ind
 	this->name = "Player";
 	this->tag = "Player";
 	//Default Weapon
-	leftWeapon = new Weapon(Weapon_Rocket, position, true, window, GM.getNewEntityIndex());
+	leftWeapon = new Weapon(Weapon_AK47, position, true, window, GM.getNewEntityIndex());
 	usingWeapon = leftWeapon;
 	defaultWeapon = leftWeapon;
 
@@ -34,6 +34,9 @@ Player::Player(sf::RenderWindow& window, sf::Vector2f position, unsigned int ind
 	dashEffect3.setFillColor(sf::Color(shape.getFillColor().r, shape.getFillColor().g, shape.getFillColor().b, 0));
 
 	removingEffectSpeed = 0.95f;
+
+
+	platforms = _platforms;
 }
 void Player::Update(float deltaTime) {
 	currPos = shape.getPosition();
@@ -73,17 +76,47 @@ void Player::Update(float deltaTime) {
 			velocity.x = dashSpeed;
 		}
 	}
+	/*
 	//Window barriers
-	if (currPos.y + shapeSize.y > windowSize.y) {
-		shape.setPosition(currPos.x, windowSize.y- shapeSize.y);
+	if (currPos.y + shapeSize.y > platforms[0].top) {
+		shape.setPosition(currPos.x, platforms[0].top- shapeSize.y);
 		isJumping = false;
 		jumped = false;
-	}
+	}*/
+	
 	if (Entity::isOutsideOfWindow(shape.getGlobalBounds())) {
 		outsideOfWindow();
 	}
 	usingWeapon->SetPosition(this->shape.getPosition());
 	usingWeapon->UpdateWeapon(deltaTime, static_cast<sf::Vector2f>(sf::Mouse::getPosition(*window)), sf::Mouse::isButtonPressed(sf::Mouse::Left));
+	//Right side
+	if (currPos.x + shapeSize.x > windowSize.x) {
+		shape.setPosition(windowSize.x - shapeSize.x, currPos.y);
+		velocity.x = 0;
+	}
+	else if (currPos.x < 0) {
+		shape.setPosition(0, currPos.y);
+		velocity.x = 0;
+	}
+
+		
+	if (!_isOnPlatform) {
+		for (int i = 0; i < platforms.size(); i++) {
+			if (Physics::isColliding(platforms[i], shape.getGlobalBounds())) {
+				//std::cout << "player is colliding with plaform with index: " << i << std::endl;
+				shape.setPosition(shape.getPosition().x, platforms[i].top - shape.getSize().y);
+				_isOnPlatform = true;
+				isJumping = false;
+				jumped = false;
+				velocity.y = 0;
+			}
+
+		}
+	}
+
+	
+	
+	
 	
 }
 void Player::FixedUpdate() {
@@ -131,12 +164,24 @@ void Player::FixedUpdate() {
 			velocity.y = -jumpingSpeed;
 			jumped = true;
 		}
+		
 		else if (isJumping) {
 			velocity.y += Physics::GRAVITY();
+			_isOnPlatform = false;
 		}
+		/*
+		if (velocity.y > 0) {
+			velocity.y += Physics::GRAVITY();
+			if (velocity.y < 0.f) {
+				velocity.y = 0;
+			}
+		}*/
 
 
 	}
+	
+	
+
 	shape.move(velocity);
 
 	
@@ -243,6 +288,23 @@ bool Player::holdingLeftWeapon()
 {
 	if (leftWeapon == usingWeapon) {
 		return true;
+	}
+	return false;
+}
+
+int Player::isOnPlatform()
+{
+	for (int i = 0; i < platforms.size(); i++) {
+		if (Physics::isColliding(platforms[i], shape.getGlobalBounds())) {
+			//std::cout << "player is colliding with plaform with index: " << i << std::endl;
+
+			shape.setPosition(shape.getPosition().x, platforms[i].top - shape.getSize().y);
+			std::cout << shape.getPosition().y << std::endl;
+			_isOnPlatform = true;
+			isJumping = false;
+			jumped = false;
+			velocity.y = 0;
+		}
 	}
 	return false;
 }

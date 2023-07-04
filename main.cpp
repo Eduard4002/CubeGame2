@@ -6,7 +6,11 @@
 
 #include "IMGUI_SFML/imgui.h"
 #include "IMGUI_SFML/imgui-SFML.h"
+#include <windows.h>
+#include "ParallaxEffect.h"
 int main() {
+	SetConsoleTitle(L"Main");
+
 	std::time_t time = std::time(NULL);
 	sf::Texture screenshotTexture;
 	sf::Clock deltaClock;
@@ -20,12 +24,25 @@ int main() {
 	bool useQuadTree = true;
 	//912x512
 	sf::RenderWindow window(sf::VideoMode(912, 512), "FPS: ", sf::Style::Close);
+	
 	window.setKeyRepeatEnabled(false);
-
+	//std::cout << sf::VideoMode::getDesktopMode().width << ", " << sf::VideoMode::getDesktopMode().height;
 	screenshotTexture.create(window.getSize().x, window.getSize().y);
 
 	GameManager& gm = GameManager::getInstance();
     gm.init(&window);
+
+	/*
+	sf::Texture temp;
+	temp.loadFromFile("res/city 1/3.png");
+	temp.setRepeated(true);
+
+	// Assign it to a sprite
+	sf::Sprite sprite;
+	sprite.setTexture(temp);
+	sprite.setScale(sf::Vector2f(2, 2));*/
+
+
 	while (window.isOpen()) {
 		currDelta = deltaClock.restart().asSeconds();
 		sf::Event evnt;

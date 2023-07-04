@@ -16,7 +16,8 @@ enum PanelType {
 	PanelType_GameOverPanel,
 	PanelType_SettingPanel,
 	PanelType_PausePanel,
-	PanelType_MainMenuPanel
+	PanelType_MainMenuPanel,
+	PanelType_CreditsPanel
 };
 #include "UIAnimator.h"
 class UIAnimator;
@@ -27,6 +28,7 @@ private:
 	//Different font sizes
 	ImFont* title;
 	ImFont* button;
+	ImFont* slider;
 
 	float currDelta;
 	ImGuiWindowFlags defaultWindowFlags;
@@ -59,13 +61,27 @@ private:
 
 	ImVec4 healthBarRed;
 	ImVec4 healthBarGreen;
+
+	int currMusicVol = 100;
+	int currSFXVol = 100;
+
+	int prevMusicVol = 100;
+	int prevSFXVol = 100;
+
+	bool vSync = false;
+
+	bool prevVSync;
 public:
-	PanelType currPanel = PanelType_MainPanel;
+	PanelType currPanel = PanelType_MainMenuPanel;
 	int highscore = 0;
 private:
 	void mainPanel();
 	void pausePanel();
 	void gameOverPanel();
+	void settingsPanel();
+	void mainMenuPanel();
+	void creditsPanel();
+	void HelpMarker(const char* desc);
 public:
 	UIManager(sf::RenderWindow& window);
 	void setPanel(PanelType type);
