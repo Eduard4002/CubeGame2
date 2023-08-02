@@ -44,7 +44,7 @@ Weapon::Weapon(WeaponType type, sf::Vector2f position, bool playerUsing,sf::Rend
 
 	//Play animation for very short time, just to get the first frame
 	animationClass->playAnimation(1, 0.00000001f);
-	//animationClass->setDefaultFrame();
+	audio = new AudioManager();
 }
 Weapon::Weapon() : Item(std::string("undefined"), sf::Vector2f(0,0), std::string("undefined")),gm(GameManager::getInstance()){
 
@@ -66,11 +66,11 @@ void Weapon::UpdateWeapon(float dt,sf::Vector2f pointTo,bool shouldShoot) {
 			isReloading = false;
 			currentAmmo = ammoAmount;
 		}
-	}
+	}/*
 	else if (isDropped) {
 		animationClass->playAnimation(2, dt);
 		
-	}
+	}*/
 	
 
 	timeSinceLastShot += dt;
@@ -91,10 +91,36 @@ void Weapon::SetPosition(sf::Vector2f position) {
 	shape.setPosition(position + weaponOffset);
 	
 }
+void Weapon::FixedUpdate() {
+	if (!isDropped) return;
+	//Platform height - 48
+	sf::Vector2f position = shape.getPosition();
+	
+	if (goingUp) {
+		shape.move(0, -Physics::GRAVITY() * 0.1f);
 
+		if ((int)position.y == (int)(window->getSize().y) - 90) {
+			goingUp = false;
+		}
+	}
+	else {
+		shape.move(0, Physics::GRAVITY() * 0.1f);
+
+		if ((int)position.y == (int)(window->getSize().y - 70)) {
+			goingUp = true;
+		}
+	}
+	
+}
+void Weapon::Reset() {
+	shape.setRotation(0);
+	currentAmmo = ammoAmount;
+	//Play animation for very short time, just to get the first frame
+	animationClass->playAnimation(1, 0.00000001f);
+}
 
 void Weapon::Shoot(sf::Vector2f rotateTo) {
-	//gm.audio->playSFX("Testing");
+	audio->playSFX(shootSFX);
 	//shootAnimation->playAnimation(texture, isShooting);
 	//float rotation = Physics::lookAtMouse(*window, sf::Vector2f(shape.getGlobalBounds().left, shape.getGlobalBounds().top));
 	float rotation = Physics::lookAtPoint(sf::Vector2f(shape.getGlobalBounds().left, shape.getGlobalBounds().top), rotateTo);
@@ -115,7 +141,7 @@ void Weapon::Shoot(sf::Vector2f rotateTo) {
 	sf::Vector2f direction = rotateTo - spawnPosition;
 	sf::Vector2f normalized = direction / std::sqrt(direction.x * direction.x + direction.y * direction.y);
 	//Spawn new bullet
-	Bullet* temp = new Bullet(10,bulletSize, spawnPosition, rotation, normalized,7.5f,playerUsing, *window, gm.getNewEntityIndex());
+	Bullet* temp = new Bullet(damageAmount,bulletSize, spawnPosition, rotation, normalized,7.5f,playerUsing, *window, gm.getNewEntityIndex());
 	temp->name = "NormalBullet";
 	temp->tag = "Bullet";
 	gm.addBullet(temp);
@@ -133,6 +159,7 @@ void Weapon::RotateToPoint( sf::Vector2f point) {
 void Weapon::Reload()
 {
 	isReloading = true;
+	audio->playSFX(reloadSFX);
 }
 
 
@@ -143,13 +170,18 @@ void Weapon::setCharacteristic(WeaponType type)
 
 	switch (type) {
 	case Weapon_AK47:
-		name = "AK-47_" + std::to_string(index);
+		name = "AK-47";
 		fireRate = 0.2f;
-		reloadTime = 2.f;
+		reloadTime = 3.f;
 		ammoAmount = 30;
+
+		damageAmount = 10;
 
 		iconX = 7;
 		iconY = 0;
+
+		shootSFX = "res/Audio/SFX/Weapon/556 Single Isolated WAV.wav";
+		reloadSFX = "res/Audio/SFX/Weapon/AK Reload Full WAV.wav";
 		
 		animationClass = new Animation(this->shape, 32, 32);
 		//Shoot animation
@@ -161,10 +193,20 @@ void Weapon::setCharacteristic(WeaponType type)
 
 		break;
 	case Weapon_M4: 
-		name = "M4_" + std::to_string(index);
-		reloadTime = 1.5f;
-		fireRate = 0.1f;
-		ammoAmount = 30;
+		name = "M4";
+		reloadTime = 2.f;
+		fireRate = 0.175f;
+		ammoAmount = 25;
+
+		damageAmount = 10;
+
+		iconX = 0;
+		iconY = 0;
+
+		shootSFX = "res/Audio/SFX/Weapon/762x39 Single Isolated WAV.wav";
+		reloadSFX = "res/Audio/SFX/Weapon/AR Reload Full WAV.wav";
+
+
 		animationClass = new Animation(this->shape, 32, 32);
 		//Shoot animation
 		animationClass->addAnimation("SMG/SMGsAnimations.png", 0, 0, 4, 0.25f, 32);
@@ -174,10 +216,17 @@ void Weapon::setCharacteristic(WeaponType type)
 		animationClass->addAnimation("GunsShiningSpriteSheet.png", 0, 0, 5, 0.2f, 32 * 7);
 		break;
 	case Weapon_Pistol:
-		name = "Pistol_" + std::to_string(index);
+		name = "Pistol";
 		reloadTime = 2.f;
 		ammoAmount = 5;
 		fireRate = 0.5f;
+		damageAmount = 5;
+
+		iconX = 4;
+		iconY = 1;
+
+		shootSFX = "res/Audio/SFX/Weapon/9mm Single Isolated.wav";
+		reloadSFX = "res/Audio/SFX/Weapon/9mm Pistol Reload 2.wav";
 
 		animationClass = new Animation(this->shape, 32, 32);
 		//Shoot animation
@@ -188,10 +237,18 @@ void Weapon::setCharacteristic(WeaponType type)
 		animationClass->addAnimation("GunsShiningSpriteSheet.png", 32*4, 1, 5, 0.2f, 32 * 4);
 		break;
 	case Weapon_Shotgun:
-		name = "Shotgun_" + std::to_string(index);
+		name = "Shotgun";
 		reloadTime = 3.5f;
 		ammoAmount = 1;
 		fireRate = 1.f;
+		damageAmount = 50;
+
+		iconX = 3;
+		iconY = 3;
+
+		shootSFX = "res/Audio/SFX/Weapon/762x54r Single Isolated WAV.wav";
+		reloadSFX = "res/Audio/SFX/Weapon/Pump Reload Full WAV.wav";
+
 
 		animationClass = new Animation(this->shape, 32, 32);
 		//Shoot animation
@@ -201,13 +258,33 @@ void Weapon::setCharacteristic(WeaponType type)
 		//Dropped animation
 		animationClass->addAnimation("GunsShiningSpriteSheet.png", 32 * 2, 2, 5, 0.2f, 32 * 4);
 		break;
+	case Weapon_Sub:
+		name = "Submachine";
+		reloadTime = 1.5f;
+		ammoAmount = 20;
+		fireRate = 0.1f;
+		damageAmount = 5;
+		iconX = 7;
+		iconY = 1;
+
+		shootSFX = "res/Audio/SFX/Weapon/22LR Spray Isolated WAV.wav";
+		reloadSFX = "res/Audio/SFX/Weapon/Semi 22LR Reload Part 2 WAV.wav";
+
+		animationClass = new Animation(this->shape, 32, 32);
+		//Shoot animation
+		animationClass->addAnimation("Pistol/PistolsAnimation.png", 0, 4, 4, 0.25f, 32);
+		//Reload animation
+		animationClass->addAnimation("Pistol/ReloadingPistols.png", 0, 4, 10, reloadTime / 10);
+		//Dropped animation
+		animationClass->addAnimation("GunsShiningSpriteSheet.png", 32 * 4, 1, 5, 0.2f, 32 * 4);
+		break;
 	case Weapon_Sniper:
 
 		reloadTime = 3.5f;
 		ammoAmount = 1;
 		fireRate = 1.f;
 
-		name = "Sniper_" + std::to_string(index);
+		name = "Sniper";
 
 		this->shape.setSize(sf::Vector2f(40 * 1.5f, 32));
 		animationClass = new Animation(this->shape, 40, 32);
@@ -219,7 +296,7 @@ void Weapon::setCharacteristic(WeaponType type)
 		animationClass->addAnimation("GunsShiningSpriteSheet.png", 32 * 5, 2, 5, 0.2f, 48 + 32 * 5);
 		break;
 	case Weapon_Rocket:
-		name = "Rocket_" + std::to_string(index);
+		name = "Rocket";
 		//shinningY = 3;
 		reloadTime = 3.5f;
 		ammoAmount = 1;
@@ -244,4 +321,10 @@ int Weapon::getAmmoAmount()
 void Weapon::Render()
 {
 	window->draw(this->shape);
+	//window->draw(this->pickableZone);
+}
+
+void Weapon::ResetAmmoAmount()
+{
+	currentAmmo = ammoAmount;
 }

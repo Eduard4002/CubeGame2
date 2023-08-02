@@ -14,6 +14,7 @@ private:
 	//Variables for moving player
 	sf::Vector2f velocity;
 
+
 	float movingSpeed;
 	float jumpingSpeed;
 	float dashSpeed;
@@ -44,7 +45,6 @@ private:
 	float dashTime;
 	float dashDuration;
 
-	Weapon* usingWeapon;
 	Weapon* defaultWeapon;
 
 	// Other member variables
@@ -59,16 +59,18 @@ private:
 	//Debugging
 	bool showGameOver = true;
 
-	std::vector<sf::FloatRect> platforms;
+	sf::FloatRect mainPlatform;
 public:
 	int health;
-	int maxHealth = 200;
+	int maxHealth = 100;
 
 	//Inventory
 	Weapon* leftWeapon;
-	Weapon* rightWeapon;
+	Weapon* rightWeapon = nullptr;
+	Weapon* usingWeapon;
+
 public:
-	Player(std::vector<sf::FloatRect> _platforms,sf::RenderWindow& window, sf::Vector2f position, unsigned int index);
+	Player(sf::FloatRect platformInfo,sf::RenderWindow& window, sf::Vector2f position, unsigned int index);
 	void Update(float deltaTime);
 	void FixedUpdate();
 	void Render();

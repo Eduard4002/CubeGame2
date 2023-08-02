@@ -42,6 +42,7 @@ void Animation::addAnimation(std::string filepath,int startX, int startY, int fr
     this->frameDurations.push_back(frameDuration);
 }
 
+
 void Animation::setDefaultFrame()
 {
     

@@ -1,17 +1,18 @@
-﻿  GameManager.cpp
+﻿  Player.cpp
 C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\Physics.h(8,40): warning C4305: 'initializing': truncation from 'double' to 'const float'
-C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\GameManager.cpp(8,51): warning C4244: 'argument': conversion from 'T' to 'T', possible loss of data
+C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\Entities\Player.cpp(87,34): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
           with
           [
               T=unsigned int
           ]
-          and
-          [
-              T=float
-          ]
+C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\Entities\Player.cpp(217,86): warning C4244: 'argument': conversion from 'float' to 'sf::Uint8', possible loss of data
+C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\Entities\Player.cpp(218,86): warning C4244: 'argument': conversion from 'float' to 'sf::Uint8', possible loss of data
+C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\Entities\Player.cpp(226,90): warning C4244: '*=': conversion from 'float' to 'sf::Uint8', possible loss of data
+C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\Entities\Player.cpp(232,91): warning C4244: '*=': conversion from 'float' to 'sf::Uint8', possible loss of data
+C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\IHaveNoNameForThis\Entities\Player.cpp(238,91): warning C4244: '*=': conversion from 'float' to 'sf::Uint8', possible loss of data
   Generating code
-  2 of 817 functions ( 0.2%) were compiled, the rest were copied from previous compilation.
+  1 of 3170 functions (<0.1%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    6 functions had inline decision re-evaluated but remain unchanged
+    26 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   IHaveNoNameForThis.vcxproj -> C:\Users\Eduard Mihic\source\repos\IHaveNoNameForThis\x64\Release\IHaveNoNameForThis.exe

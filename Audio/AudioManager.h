@@ -18,10 +18,14 @@ private:
 	//Music array
 	std::vector<BackgroundMusic> bgArr;
 
+	sf::SoundBuffer buff;
+
 	sf::Sound sound;
 	sf::Music music;
 
 	int currMusicIndex;
+
+	bool playingCustomMusic;
 
 public:
 	bool addSFX(std::string name, std::string fileName);
@@ -32,6 +36,8 @@ public:
 	void playMusic(std::string name);
 	void setMusicVolume(int val);
 
+	void playCustomMusic(std::string fileName, bool repeat);
+	void stopCustomMusic();
 	void Update();
 };
 

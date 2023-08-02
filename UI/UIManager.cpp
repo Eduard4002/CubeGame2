@@ -29,6 +29,8 @@ UIManager::UIManager(sf::RenderWindow& window)
 	title = ImGui::GetIO().Fonts->AddFontFromFileTTF("res/Font/ChakraPetch-Medium.ttf", 96);
 	button = ImGui::GetIO().Fonts->AddFontFromFileTTF("res/Font/ChakraPetch-Medium.ttf", 64);
 	slider = ImGui::GetIO().Fonts->AddFontFromFileTTF("res/Font/ChakraPetch-Medium.ttf", 32);
+	pickup = ImGui::GetIO().Fonts->AddFontFromFileTTF("res/Font/ChakraPetch-Medium.ttf", 16);
+
 
 
 
@@ -71,7 +73,14 @@ UIManager::UIManager(sf::RenderWindow& window)
 	/*
 	std::shared_ptr<ColorAnimation> testColAnimation = std::make_shared<ColorAnimation>(2, ImVec4(1.f,1.f,1.f,0.f), ImVec4(1.f,1.f,1.f,1.f));
 	animator.addAnimation("Color", testColAnimation);*/
+	/*
+	titleAudio = new AudioManager();
+	titleAudio->addMusic("Main", "res/Audio/Music/SkyFire (Title Screen) (1).ogg");
+	titleAudio->playMusic("Main");
 
+	gameOverAudio = new AudioManager();
+	gameOverAudio->addMusic("Main", "res/Audio/Music/Defeated (Game Over Tune).ogg");*/
+	
 }
 void UIManager::Update(float currDelta) {
 	this->currDelta = currDelta;
@@ -86,16 +95,16 @@ void UIManager::Update(float currDelta) {
 	if (currPanel != PanelType_MainMenuPanel && sf::Keyboard::isKeyPressed(sf::Keyboard::Escape) && !paused) {
 		currPanel = PanelType_PausePanel;
 	}
-
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::G)) {
-		//currPanel = PanelType_GameOverPanel;
-		setPanel(PanelType_GameOverPanel);
+	//As the background we can have the parrallax effect moving with the mouse
+	if (currPanel == PanelType_MainMenuPanel || currPanel == PanelType_CreditsPanel || currPanel == PanelType_ChangeBackground) {
+		GameManager::getInstance().background->Update(sf::Vector2f(sf::Mouse::getPosition()));
+		
 	}
-	
+
 	//testAnimation.Update(currDelta);
 }
 void UIManager::Render() {
-	if (!paused) {
+	if (!paused ) {
 		this->window->draw(inventory1);
 		this->window->draw(inventory2);
 	}
@@ -110,8 +119,8 @@ void UIManager::ShutDown()
 void UIManager::loadTexture(short iconX, short iconY, bool isTex1)
 {
 	sf::Texture* texture = new sf::Texture();
-	if (!texture->loadFromFile("res/Icons/GunHalf.png", sf::IntRect(iconX * 32, iconY * 32, 32, 32))) {
-		std::cout << "Error loading spritesheet with file path: " << "res/Icons/GunHalf.png" << std::endl;
+	if (!texture->loadFromFile("res/Icons/Guns.png", sf::IntRect(iconX * 32, iconY * 32, 32, 32))) {
+		std::cout << "Error loading spritesheet with file path: " << "res/Icons/Guns.png" << std::endl;
 	}
 	if (isTex1) {
 		tex1 = *texture;
@@ -133,8 +142,10 @@ void UIManager::mainPanel()
 
 	
 	GameManager::getInstance().getPlayerHealth(currPlayerHealth, maxPlayerHealth);
-	bool holdingLeft =  GameManager::getInstance().getPlayerLeftInventory(leftIconX, leftIconY);
-	bool holdingRight = GameManager::getInstance().getPlayerRightInventory(rightIconX, rightIconY);
+	float healthPercent = (float)currPlayerHealth / (float)maxPlayerHealth;
+	bool holdingLeft =  GameManager::getInstance().getPlayerLeftInventory(leftIconX, leftIconY,leftAmmoAmount);
+	bool holdingRight = GameManager::getInstance().getPlayerRightInventory(rightIconX, rightIconY,rightAmmoAmount);
+	//sf::Vector2f(20, 440)
 
 	if (holdingLeft) {
 		inventory1.setOutlineColor(sf::Color::White);
@@ -148,6 +159,16 @@ void UIManager::mainPanel()
 	else {
 		inventory2.setOutlineColor(sf::Color(46, 52, 64));
 	}
+	ImGui::PushFont(pickup);
+	ImGui::SetCursorPos(ImVec2(22,440));
+	ImGui::Text(std::to_string(leftAmmoAmount).c_str());
+	if (rightAmmoAmount != -1) {
+		ImGui::SetCursorPos(ImVec2(102, 440));
+		ImGui::Text(std::to_string(rightAmmoAmount).c_str());
+	}
+	
+
+	ImGui::PopFont();
 	if (previousLeftIconX != leftIconX) {
 		loadTexture(leftIconX, leftIconY, true);
 		previousLeftIconX = leftIconX;
@@ -175,7 +196,7 @@ void UIManager::mainPanel()
 	ImGui::PushStyleColor(ImGuiCol_ButtonActive, healthBarGreen);
 
 	ImGui::SetCursorPos(ImVec2(15, 375));
-	ImGui::Button(" ", ImVec2(currPlayerHealth, 50));
+	ImGui::Button(" ", ImVec2(200 * healthPercent, 50));
 
 	ImGui::PopStyleColor();
 	ImGui::PopStyleColor();
@@ -196,11 +217,25 @@ void UIManager::mainPanel()
 		ImGui::SetCursorPos(ImVec2(95, 435));
 		ImGui::Image(tex2, sf::Vector2f(64, 64));
 	}
-
+	if (currBackgroundIndex == 7) {
+		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4((float)46 / 255, (float)52 / 255, (float)64 / 255, 1));
+	}
 	std::string scoreText = "SCORE: " + std::to_string(GameManager::getInstance().getCurrentScore());
 	ImGui::SetCursorPos(ImVec2(window->getSize().x / 2 - ImGui::CalcTextSize(scoreText.c_str()).x / 2 , 0));
 	ImGui::Text(scoreText.c_str());
 
+	if (currBackgroundIndex == 7) {
+		ImGui::PopStyleColor();
+	}
+	//Pickup weapon text
+	if (showPickup) {
+		ImGui::SetCursorPos(ImVec2(playerPos.x + 50,playerPos.y - 20));
+		std::string pickupText = "Press F to pickup " + weaponName;
+		ImGui::PushFont(pickup);
+		ImGui::Text(pickupText.c_str());
+		ImGui::PopFont();
+
+	}
 	ImGui::End();
 	ImGui::PopStyleColor();
 
@@ -256,7 +291,8 @@ void UIManager::pausePanel()
 	ImGui::SetCursorPos(ImVec2(window->getSize().x / 2 - 300 / 2, 350));
 
 	if (ImGui::Button("MAIN MENU", ImVec2(300, 75))) {
-		setPanel(PanelType_MainMenuPanel);
+		//setPanel(PanelType_MainMenuPanel);
+		GameManager::getInstance().quitGame();
 	}
 
 	animator->Update(currPanel,currDelta);
@@ -273,19 +309,23 @@ void UIManager::pausePanel()
 }
 void UIManager::mainMenuPanel()
 {
-	ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0, 0, 0, 1.f));
+	ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0, 0, 0, 0.0f));
 
 	ImGui::Begin("Temp", NULL, defaultWindowFlags);
 	ImGui::SetWindowSize("Temp", ImVec2(window->getSize().x, window->getSize().y));
 	ImGui::SetWindowPos("Temp", ImVec2(0, 0));
 
 	ImGui::PushFont(title);
-	ImVec2 txtSize = ImGui::CalcTextSize("MAIN MENU");
-
+	ImVec2 txtSize = ImGui::CalcTextSize("Blocky Brawl");
+	if (currBackgroundIndex == 7) {
+		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4((float)46 / 255, (float)52 / 255, (float)64 / 255, 1));
+	}
 	ImGui::SetCursorPos(ImVec2(window->getSize().x / 2 - txtSize.x / 2, 20));
-	ImGui::Text("MAIN MENU");
+	ImGui::Text("Blocky Brawl");
 	ImGui::PopFont();
-
+	if (currBackgroundIndex == 7) {
+		ImGui::PopStyleColor();
+	}
 	ImGui::PushFont(button);
 
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4((float)76 / 255, (float)86 / 255, (float)106 / 255, 1));
@@ -298,23 +338,31 @@ void UIManager::mainMenuPanel()
 	//Resume button
 	ImGui::SetCursorPos(ImVec2(window->getSize().x / 2 - 250 / 2, 150));
 	if (ImGui::Button("START", ImVec2(250, 75))) {
+		
 		GameManager::getInstance().startGame();
 	}
-
+	//Settings button
 	ImGui::SetCursorPos(ImVec2(window->getSize().x / 2 - 250 / 2, 250));
 
-	if (ImGui::Button("CREDITS", ImVec2(250, 75))) {
-		setPanel(PanelType_CreditsPanel);
+	if (ImGui::Button("SETTINGS", ImVec2(250, 75))) {
+		setPanel(PanelType_SettingPanel);
 	}
-
+	
 	//Quit button
 
 	ImGui::SetCursorPos(ImVec2(window->getSize().x / 2 - 250 / 2, 350));
 
 	if (ImGui::Button("QUIT", ImVec2(250, 75))) {
-		std::cout << "Quit clicked" << std::endl;
+		ShutDown();
+		window->close();
 	}
 	ImGui::PopFont();
+
+	ImGui::SetCursorPos(ImVec2(window->getSize().x - 200, 405));
+
+	if (ImGui::Button("CREDITS", ImVec2(175, 60))) {
+		setPanel(PanelType_CreditsPanel);
+	}
 
 	ImGui::PopStyleColor();
 	ImGui::PopStyleColor();
@@ -326,6 +374,120 @@ void UIManager::mainMenuPanel()
 }
 void UIManager::creditsPanel()
 {
+	ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0, 0, 0, 0.f));
+
+	ImGui::Begin("Temp", NULL, defaultWindowFlags);
+	ImGui::SetWindowSize("Temp", ImVec2(window->getSize().x, window->getSize().y));
+	ImGui::SetWindowPos("Temp", ImVec2(0, 0));
+	if (currBackgroundIndex == 7 || currBackgroundIndex == 5) {
+		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4((float)46 / 255, (float)52 / 255, (float)64 / 255, 1));
+	}
+	ImGui::PushFont(title);
+	ImVec2 txtSize = ImGui::CalcTextSize("CREDITS");
+
+	ImGui::SetCursorPos(ImVec2(window->getSize().x / 2 - txtSize.x / 2, 20));
+	ImGui::Text("CREDITS");
+	ImGui::PopFont();
+	
+	ImGui::PushFont(button);
+
+	
+
+	txtSize = ImGui::CalcTextSize("DEVELOPED BY");
+	ImGui::SetCursorPos(ImVec2(80, 120));
+	ImGui::Text("DEVELOPED BY");
+	ImGui::SetCursorPos(ImVec2(80, 170));
+	ImGui::Text("EDUARD");
+
+	ImGui::SetCursorPos(ImVec2(130 + txtSize.x , 120));
+	ImGui::Text("BETA TESTERS");
+
+
+	ImGui::SetCursorPos(ImVec2(130 + txtSize.x, 170));
+	ImGui::Text("-Kajzera");
+	ImGui::SetCursorPos(ImVec2(130 + txtSize.x, 220));
+	ImGui::Text("-FKF");
+	ImGui::PushFont(slider);
+
+	ImGui::SetCursorPos(ImVec2(80, 250));
+	ImGui::Text("GUN PACK: DotStudio[itch.io]");
+
+	ImGui::SetCursorPos(ImVec2(80, 300));
+	ImGui::Text("SFX: SnakeF8 Part1&Part2[itch.io]");
+
+	if (currBackgroundIndex == 7 || currBackgroundIndex == 5) {
+		ImGui::PopStyleColor();
+	}
+	ImGui::PopFont();
+	//Back button
+	ImGui::SetCursorPos(ImVec2(window->getSize().x / 2 - 250 / 2, 425));
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4((float)76 / 255, (float)86 / 255, (float)106 / 255, 1));
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4((float)59 / 255, (float)66 / 255, (float)82 / 255, 1));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4((float)46 / 255, (float)52 / 255, (float)64 / 255, 1));
+
+	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 5);
+	if (ImGui::Button("BACK", ImVec2(250, 75))) {
+		setPanel(PanelType_MainMenuPanel);
+	}
+	ImGui::PopFont();
+
+	ImGui::PopStyleColor();
+	ImGui::PopStyleColor();
+	ImGui::PopStyleColor();
+	ImGui::PopStyleVar();
+	ImGui::End();
+	ImGui::PopStyleColor();
+}
+void UIManager::changeBackgroundPanel()
+{
+	ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0, 0, 0, 0.f));
+
+	ImGui::Begin("Temp", NULL, defaultWindowFlags);
+	ImGui::SetWindowSize("Temp", ImVec2(window->getSize().x, window->getSize().y));
+	ImGui::SetWindowPos("Temp", ImVec2(0, 0));
+
+	ImGui::PushFont(title);
+	ImVec2 txtSize = ImGui::CalcTextSize("BACKGROUND");
+	if (currBackgroundIndex == 7) {
+		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4((float)46 / 255, (float)52 / 255, (float)64 / 255, 1));
+	}
+	ImGui::SetCursorPos(ImVec2(window->getSize().x / 2 - txtSize.x / 2, 20));
+	ImGui::Text("BACKGROUND");
+	ImGui::PopFont();
+	if (currBackgroundIndex == 7) {
+		ImGui::PopStyleColor();
+	}
+	ImGui::SetCursorPos(ImVec2(window->getSize().x - 200, getPosY(50)));
+
+	ImGui::PushFont(button);
+	if (ImGui::Button("NEXT", ImVec2(200, 75))) {
+		currBackgroundIndex++;
+		if (currBackgroundIndex > 8) {
+			currBackgroundIndex = 1;
+		}
+		GameManager::getInstance().setBackground(currBackgroundIndex);
+	}
+
+	ImGui::SetCursorPos(ImVec2(0, getPosY(50)));
+
+	if (ImGui::Button("PREV", ImVec2(200, 75))) {
+		currBackgroundIndex--;
+
+		if (currBackgroundIndex < 1) {
+			currBackgroundIndex = 8;
+		}
+		GameManager::getInstance().setBackground(currBackgroundIndex);
+
+	}
+
+	ImGui::SetCursorPos(ImVec2(window->getSize().x / 2 - 125, getPosY(80)));
+	if (ImGui::Button("BACK", ImVec2(250, 75))) {
+		GameManager::getInstance().saveBackground(currBackgroundIndex);
+		setPanel(PanelType_SettingPanel);
+	}
+	ImGui::PopFont();
+	ImGui::End();
+	ImGui::PopStyleColor();
 }
 void UIManager::gameOverPanel()
 {
@@ -348,10 +510,26 @@ void UIManager::gameOverPanel()
 
 	ImGui::SetCursorPos(ImVec2(window->getSize().x / 2 - txtSize.x / 2, 150));
 
-	std::string timeText = "You failed in: " + std::to_string((int)floor(survivedTime.asSeconds())) + " seconds...";
-	ImGui::Text(timeText.c_str());
+	int seconds = survivedTime.asSeconds();
+	if (seconds >= 60 && seconds < 120) {
+		std::string timeText = "You failed in: " + std::to_string((int(seconds / 60) % 60)) + " minute & " + std::to_string((int(seconds % 60))) + " seconds ";
+		ImGui::Text(timeText.c_str());
+	}
+	else if (seconds >= 120) {
+		std::string timeText = "You failed in: " + std::to_string((int(seconds / 60) % 60)) + " minutes & " + std::to_string((int(seconds % 60))) + " seconds ";
+		ImGui::Text(timeText.c_str());
+	}
+	else {
+		std::string timeText = "You failed in: " + std::to_string((int(seconds % 60))) + " seconds ";
+		ImGui::Text(timeText.c_str());
+	}
 
-	ImGui::SetCursorPos(ImVec2(window->getSize().x / 2 - txtSize.x / 2, 200));
+	ImGui::SetCursorPos(ImVec2(window->getSize().x / 2 - txtSize.x / 2, 190));
+
+	std::string scoreTxt = "SCORE: " + std::to_string(score) + " ";
+	ImGui::Text(scoreTxt.c_str());
+
+	ImGui::SetCursorPos(ImVec2(window->getSize().x / 2 - txtSize.x / 2, 230));
 
 	std::string highscoreText = "HIGHSCORE: " + std::to_string(highscore) + " ";
 	ImGui::Text(highscoreText.c_str());
@@ -372,7 +550,7 @@ void UIManager::gameOverPanel()
 	//Quit button
 	ImGui::SetCursorPos(ImVec2(window->getSize().x / 2 - 250 / 2, 400));
 	if (ImGui::Button("QUIT", ImVec2(250, 75))) {
-		std::cout << "Quit clicked" << std::endl;
+		GameManager::getInstance().quitGame();
 	}
 	ImGui::PopFont();
 
@@ -448,16 +626,27 @@ void UIManager::settingsPanel()
 
 	ImGui::SetCursorPos(ImVec2(window->getSize().x / 2 - 125, getPosY(80)));
 	if (ImGui::Button("BACK", ImVec2(250, 75))) {
-		setPanel(PanelType_PausePanel);
+		if (GameManager::getInstance().onMainMenu) {
+			setPanel(PanelType_MainMenuPanel);
+		}
+		else {
+			setPanel(PanelType_PausePanel);
+		}
+	}
+
+	ImGui::SetCursorPos(ImVec2(window->getSize().x / 2 + 200 , getPosY(80)));
+
+	if (ImGui::Button("BACKGROUND", ImVec2(250, 75))) {
+		setPanel(PanelType_ChangeBackground);
 	}
 
 	//Change respective values
 	if (prevMusicVol != currMusicVol) {
-		GameManager::getInstance().audio->setMusicVolume(currMusicVol);
+		GameManager::getInstance().setMusicVolume(currMusicVol);
 		prevMusicVol = currMusicVol;
 	}
 	if (prevSFXVol != currSFXVol) {
-		GameManager::getInstance().audio->setSFXVolume(currSFXVol);
+		GameManager::getInstance().setSFXVolume(currSFXVol);
 		prevSFXVol = currSFXVol;
 	}
 	if (prevVSync != vSync) {
@@ -481,6 +670,10 @@ void UIManager::settingsPanel()
 
 bool UIManager::isPaused() {
 	return paused;
+}
+void UIManager::setPaused(bool paused)
+{
+	this->paused = paused;
 }
 float UIManager::getPosY(short percent)
 {
@@ -518,10 +711,16 @@ void UIManager::setPanel(PanelType type) {
 		settingsPanel();
 		break;
 	case PanelType_MainMenuPanel:
+		paused = true;
 		mainMenuPanel();
 		break;
 	case PanelType_CreditsPanel:
+		paused = true;
 		creditsPanel();
+		break;
+	case PanelType_ChangeBackground:
+		paused = true;
+		changeBackgroundPanel();
 		break;
 	}
 }

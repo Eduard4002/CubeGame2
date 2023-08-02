@@ -11,7 +11,6 @@
 int main() {
 	SetConsoleTitle(L"Main");
 
-	std::time_t time = std::time(NULL);
 	sf::Texture screenshotTexture;
 	sf::Clock deltaClock;
 	float currDelta = 0;
@@ -23,7 +22,7 @@ int main() {
 
 	bool useQuadTree = true;
 	//912x512
-	sf::RenderWindow window(sf::VideoMode(912, 512), "FPS: ", sf::Style::Close);
+	sf::RenderWindow window(sf::VideoMode(912, 512), "BLOCKY BRAWL", sf::Style::Close);
 	
 	window.setKeyRepeatEnabled(false);
 	//std::cout << sf::VideoMode::getDesktopMode().width << ", " << sf::VideoMode::getDesktopMode().height;
@@ -31,16 +30,6 @@ int main() {
 
 	GameManager& gm = GameManager::getInstance();
     gm.init(&window);
-
-	/*
-	sf::Texture temp;
-	temp.loadFromFile("res/city 1/3.png");
-	temp.setRepeated(true);
-
-	// Assign it to a sprite
-	sf::Sprite sprite;
-	sprite.setTexture(temp);
-	sprite.setScale(sf::Vector2f(2, 2));*/
 
 
 	while (window.isOpen()) {
@@ -54,10 +43,11 @@ int main() {
 			}
 			else if (evnt.type == sf::Event::KeyPressed) {
 				if (evnt.key.code == sf::Keyboard::C) {
-					std::cout << "Started taking screenshot" << std::endl;
 					screenshotTexture.update(window);
 					sf::Image screenshot = screenshotTexture.copyToImage();
 					std::tm tm_local;
+					std::time_t time = std::time(NULL);
+
 					errno_t err = localtime_s(&tm_local, &time);
 
 					std::string fileName = "res/" + std::to_string(tm_local.tm_hour) + "_" + std::to_string(tm_local.tm_min) + "_" + std::to_string(tm_local.tm_sec) + ".png";
@@ -80,7 +70,7 @@ int main() {
 
 		if (counterFPS >= 1.f) {
 			std::string title = "FPS: " + std::to_string(FPS);
-			window.setTitle(title);
+			//window.setTitle(title);
 
 			FPS = 0;
 			counterFPS = 0;

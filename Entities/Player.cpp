@@ -1,18 +1,18 @@
 #include "Player.h"
-Player::Player(std::vector<sf::FloatRect> _platforms,sf::RenderWindow& window, sf::Vector2f position, unsigned int index) : Entity(window, index),GM(GameManager::getInstance()){
+Player::Player(sf::FloatRect platformInfo,sf::RenderWindow& window, sf::Vector2f position, unsigned int index) : Entity(window, index),GM(GameManager::getInstance()){
 	this->velocity = sf::Vector2f(0.f, 0.f);
 	this->movingSpeed = 15;
 	this->jumpingSpeed = 40;
 	this->shapeSize = sf::Vector2u(50, 50);
 	this->shape = sf::RectangleShape(static_cast<sf::Vector2f>(shapeSize));
-	this->shape.setPosition(position );
+	this->shape.setPosition(position);
 	this->shape.setFillColor(sf::Color::Blue);
 	this->startPos = position;
 
 	this->name = "Player";
 	this->tag = "Player";
 	//Default Weapon
-	leftWeapon = new Weapon(Weapon_AK47, position, true, window, GM.getNewEntityIndex());
+	leftWeapon = new Weapon(Weapon_Sub , position, true, window, GM.getNewEntityIndex());
 	usingWeapon = leftWeapon;
 	defaultWeapon = leftWeapon;
 
@@ -36,7 +36,7 @@ Player::Player(std::vector<sf::FloatRect> _platforms,sf::RenderWindow& window, s
 	removingEffectSpeed = 0.95f;
 
 
-	platforms = _platforms;
+	mainPlatform = platformInfo;
 }
 void Player::Update(float deltaTime) {
 	currPos = shape.getPosition();
@@ -76,13 +76,6 @@ void Player::Update(float deltaTime) {
 			velocity.x = dashSpeed;
 		}
 	}
-	/*
-	//Window barriers
-	if (currPos.y + shapeSize.y > platforms[0].top) {
-		shape.setPosition(currPos.x, platforms[0].top- shapeSize.y);
-		isJumping = false;
-		jumped = false;
-	}*/
 	
 	if (Entity::isOutsideOfWindow(shape.getGlobalBounds())) {
 		outsideOfWindow();
@@ -101,17 +94,16 @@ void Player::Update(float deltaTime) {
 
 		
 	if (!_isOnPlatform) {
-		for (int i = 0; i < platforms.size(); i++) {
-			if (Physics::isColliding(platforms[i], shape.getGlobalBounds())) {
-				//std::cout << "player is colliding with plaform with index: " << i << std::endl;
-				shape.setPosition(shape.getPosition().x, platforms[i].top - shape.getSize().y);
-				_isOnPlatform = true;
-				isJumping = false;
-				jumped = false;
-				velocity.y = 0;
-			}
-
+		if (Physics::isColliding(mainPlatform, shape.getGlobalBounds())) {
+			//std::cout << "player is colliding with plaform with index: " << i << std::endl;
+			shape.setPosition(shape.getPosition().x, mainPlatform.top - shape.getSize().y);
+			_isOnPlatform = true;
+			isJumping = false;
+			jumped = false;
+			velocity.y = 0;
 		}
+
+		
 	}
 
 	
@@ -137,13 +129,14 @@ void Player::FixedUpdate() {
 		}
 	}
 	else {
-		// Previous movement logic...
+		
 		if (movingLeft) {
 			velocity.x = -movingSpeed;
 		}
 		else if (movingRight) {
 			velocity.x = movingSpeed;
 		}
+		
 		else {
 			//if not moving slowly come to descent, friction
 			if (velocity.x > 0) {
@@ -183,7 +176,7 @@ void Player::FixedUpdate() {
 	
 
 	shape.move(velocity);
-
+	
 	
 }
 void Player::Render() {
@@ -260,24 +253,21 @@ void Player::setInventoryItem(bool left,Weapon* item)
 {
 	if (left) {
 		this->leftWeapon = item;
+		this->usingWeapon = leftWeapon;
+
 	}
 	else {
 		this->rightWeapon = item;
+		this->usingWeapon = rightWeapon;
+
 	}
 }
 
 void Player::TakeDamage(int damage) {
 	if (health - damage <= 0) {
 		//Player dead 
-		if (showGameOver) {
-			//GameManager::getInstance().GameOver();
-			GameManager::getInstance().UI->setPanel(PanelType_GameOverPanel);
-		}
-		else {
-			GameManager::getInstance().GameOver();
-			std::cout << "PLAYER IS DEAD" << std::endl;
-			std::cout << "GAME OVER!!!" << std::endl;
-		}
+		GameManager::getInstance().GameOver();
+
 		
 		return;
 	}
@@ -292,27 +282,13 @@ bool Player::holdingLeftWeapon()
 	return false;
 }
 
-int Player::isOnPlatform()
-{
-	for (int i = 0; i < platforms.size(); i++) {
-		if (Physics::isColliding(platforms[i], shape.getGlobalBounds())) {
-			//std::cout << "player is colliding with plaform with index: " << i << std::endl;
 
-			shape.setPosition(shape.getPosition().x, platforms[i].top - shape.getSize().y);
-			std::cout << shape.getPosition().y << std::endl;
-			_isOnPlatform = true;
-			isJumping = false;
-			jumped = false;
-			velocity.y = 0;
-		}
-	}
-	return false;
-}
 
 void Player::Reset()
 {
-	shape.setPosition(startPos);
+	shape.setPosition(sf::Vector2f(startPos.x,startPos.y-48));
 	leftWeapon = defaultWeapon;
+	leftWeapon->ResetAmmoAmount();
 	usingWeapon = leftWeapon;
 	rightWeapon = nullptr;
 	velocity.x = 0;

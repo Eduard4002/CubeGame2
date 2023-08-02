@@ -3,6 +3,7 @@
 #include "Bullet.h"
 #include "../GameManager.h"
 #include "../Animation.h"
+#include "../Audio/AudioManager.h"
 class GameManager;
 class Animation;
 enum WeaponType {
@@ -10,8 +11,9 @@ enum WeaponType {
 	Weapon_M4 = 1,
 	Weapon_Pistol = 2,
 	Weapon_Shotgun = 3,
-	Weapon_Sniper = 4,
-	Weapon_Rocket = 5
+	Weapon_Sub = 4,
+	Weapon_Sniper = 5,
+	Weapon_Rocket = 6
 };
 class Weapon : public Item
 {
@@ -26,22 +28,32 @@ private:
 	float accuracy;
 	float fireRate;
 	float reloadTime;
-	float damageAmount;
+	float damageAmount = 10;
 	int ammoAmount;
+
+	std::string shootSFX;
+	std::string reloadSFX;
 
 	bool isShooting;
 	bool isReloading;
 
-	//Is the player shooting from this weapon?
-	bool playerUsing;
 
 	int currentAmmo;
 
 	//Animations
 	Animation* animationClass;
+
+	//dropped weapon animation variables
+	bool goingUp = false;
 public:
 	int iconX;
 	int iconY;
+
+	//Is the player shooting from this weapon?
+	bool playerUsing;
+
+	AudioManager* audio;
+
 private:
 	void setCharacteristic(WeaponType type);
 public:
@@ -53,14 +65,20 @@ public:
 
 	void UpdateWeapon(float dt,sf::Vector2f pointTo,bool shouldShoot);
 	void SetPosition(sf::Vector2f position);
+	void FixedUpdate();
 
 	//Rotation
 	void RotateToPoint(sf::Vector2f point);
+
+	/*Resets the rotation and goes back to the first frame*/
+	void Reset();
 
 	//Reload
 	void Reload();
 
 	void Render();
+
+	void ResetAmmoAmount();
 public:
 	int getAmmoAmount();
 };

@@ -29,8 +29,9 @@ private:
 public:
 	ParallaxEffect(int layers);
 
-	void addLayer(std::string fileName,float effect, sf::Vector2f playerPos);
+	void addLayer(std::string fileName,float effect);
 	void Update(sf::Vector2f playerPos);
 	void Render(sf::RenderWindow& window);
+	void removeLayers();
 };
 

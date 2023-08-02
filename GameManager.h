@@ -18,6 +18,10 @@ class Weapon;
 class Item;
 class EnemySpawner;
 class UIManager;
+struct DroppedWeapon {
+	Weapon* weapon;
+	float currDisTime;
+};
 class GameManager
 {
 public:
@@ -25,11 +29,16 @@ public:
 	std::vector<Item*> items;
 	std::vector<Bullet*> bullets;
 	std::vector<Enemy*> enemies;
-	std::vector<Weapon*> droppedWeapons;
+	std::vector<DroppedWeapon> droppedWeapons;
 	std::vector<Platform*> platformTiles;
 	
 	UIManager* UI;
 	AudioManager* audio;
+
+	ParallaxEffect* background;
+	float despawnTime = 10.f;
+
+	bool onMainMenu = true;
 
 private:
 	Quadtree quadTree;
@@ -42,24 +51,33 @@ private:
 
 	sf::Vector2f playerPos;
 	//If we are colliding with a item, the index in the "droppedWeapons" will be shown here
-	int indexWeapon;
+	int indexWeapon = -1;
 
 	float enemySpawnTimer;
 	float currTime;
 
-	short currentScore = 500;
+	int currentScore = 0;
 
 	std::unique_ptr<EnemySpawner> spawner;
 
-	ParallaxEffect* background;
 
 	bool gameStarted = false;
-	bool onMainMenu = true;
+
+	sf::Sprite platform;
+	sf::Texture platformTexture;
+
+	sf::Shader shader;
+	sf::RectangleShape shaderShape;
+
+	bool shaderAvailable = false;
+
+
 private:
 	GameManager() : quadTree(sf::FloatRect(0,0,912,512)){};
 	GameManager(const GameManager&) = delete;
 	GameManager& operator=(const GameManager&) = delete;
 	int getItemIndexFromName(std::string name);
+
 
 public:
 	static GameManager& getInstance() {
@@ -88,8 +106,8 @@ public:
 	unsigned int getNewEntityIndex();
 
 	void getPlayerHealth(int& currHealth, int& maxHealth);
-	bool getPlayerLeftInventory(short& iconX, short& iconY);
-	bool getPlayerRightInventory(short& iconX, short& iconY);
+	bool getPlayerLeftInventory(short& iconX, short& iconY, int& ammoAmount);
+	bool getPlayerRightInventory(short& iconX, short& iconY,int& ammoAmount);
 
 	int getRandomInt(int min, int max);
 
@@ -101,5 +119,17 @@ public:
 	void setVSync(bool set);
 
 	void startGame();
+	void quitGame();
+
+
+	//Very simple Encrypt/Decrypt for saving and loading highscore
+	void Encrypt(std::string& data, std::string key);
+	void Decrypt(std::string& data, std::string key);
+
+	void setBackground(short index);
+	void saveBackground(short index);
+
+	void setMusicVolume(int vol);
+	void setSFXVolume(int vol);
 };
 

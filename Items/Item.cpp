@@ -27,7 +27,7 @@ Item::Item(sf::Vector2f position, sf::RenderWindow& window, unsigned int index) 
 	sf::Vector2f shapeSize = sf::Vector2f(32 * 1.5f, 32 * 1.5f);
 
 	this->pickableZone.setSize({ shapeSize.x * 2.f,shapeSize.y * 2.f });
-	this->pickableZone.setOrigin(sf::Vector2f(shapeSize.x * 0.5f, shapeSize.y * 0.5f));
+	this->pickableZone.setOrigin(sf::Vector2f(shapeSize.x, shapeSize.y));
 	this->pickableZone.setPosition(position);
 	this->pickableZone.setOutlineColor(sf::Color::Green);
 	this->pickableZone.setOutlineThickness(2);

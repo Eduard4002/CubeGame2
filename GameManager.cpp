@@ -9,61 +9,71 @@ void GameManager::init(sf::RenderWindow* _window = nullptr) {
 	if (_window != nullptr) {
 		this->window = _window;
 	}
-	playerPos = sf::Vector2f(100, window->getSize().y - 200);
+	playerPos = sf::Vector2f(window->getSize().x / 2, window->getSize().y - 48);
 	objectIndex = 1;
 	
 
-	
-	//entities.push_back(object);
-	Enemy* enemy = new Enemy(EnemyType_Easy, player, { playerPos.x + 300,playerPos.y }, *window, getNewEntityIndex());
-	//enemies.push_back(enemy);
 	quadTree = Quadtree(sf::FloatRect(0, 0, 912, 512));
 	
-	spawner = std::make_unique<EnemySpawner>(3.f, player, *window);
 
 	UI = new UIManager(*window);
 
 	audio = new AudioManager();
-	audio->addSFX("Testing", "res/Audio/SFX/test.wav");
+	//audio->playSFX("res/Audio/SFX/Weapon/Isolated/.22LR/WAV/22LR Single Isolated WAV.wav");
+	audio->addMusic("1", "res/Audio/Music/Without Fear.ogg");
+	audio->addMusic("2", "res/Audio/Music/Alone Against Enemy.ogg");
+	audio->addMusic("3", "res/Audio/Music/Rain of Lasers.ogg");
+	audio->addMusic("4", "res/Audio/Music/Space Heroes.ogg");
+	audio->addMusic("5", "res/Audio/Music/Battle in the Stars.ogg");
+	audio->addMusic("6", "res/Audio/Music/Epic End.ogg");
 
-	audio->addMusic("Test", "res/Audio/Music/Without Fear.ogg");
-	audio->addMusic("Test2", "res/Audio/Music/DeathMatch (Boss Theme).ogg");
 
-	//audio->playMusic("Test");
+	//audio->playMusic("1");
+	audio->playCustomMusic("res/Audio/Music/SkyFire (Title Screen) (1).ogg",true);
 	
-	audio->setMusicVolume(10);
-
 	//Get random seed
 	std::time_t time = std::time(NULL);
 	srand(time);
 
-	enemySpawnTimer = 2.f;
 
 	background = new ParallaxEffect(5);
-	background->addLayer("res/city 1/1.png", 0.4f, playerPos);
-	background->addLayer("res/city 1/2.png", 0.3f, playerPos);
-	background->addLayer("res/city 1/3.png", 0.2f, playerPos);
-	background->addLayer("res/city 1/4.png", 0.1f, playerPos);
-	background->addLayer("res/city 1/5.png", 0.0f, playerPos);
+	std::ifstream file;
+	file.open("data.txt");
+	std::string index;
+	std::getline(file, index);
+	setBackground(std::stoi(index));
 
-
+	UI->currBackgroundIndex = (short)std::stoi(index);
+	if (!platformTexture.loadFromFile("res/steelPlatform/main.png")) {
+		std::cout << "Error loading file: res/steelPlatform/main.png" << std::endl;
+	}
+	platform.setTexture(platformTexture);
 
 	//Add platform
-	sf::FloatRect firstPlatform(sf::Vector2f(0, window->getSize().y - (16 * 3)), sf::Vector2f(16 * (window->getSize().x / 16), 16 * 3));
-	//sf::FloatRect secondPlatform(sf::Vector2f(16 * 35, window->getSize().y - (16 * 3)), sf::Vector2f(16 * 23, 16 * 3));
+	sf::FloatRect firstPlatform(sf::Vector2f(0, window->getSize().y - (16 * 3)), sf::Vector2f(window->getSize().x, 16 * 3));
 
-	AddPlatform(sf::Vector2f(firstPlatform.left,  firstPlatform.top),  sf::Vector2f(firstPlatform.width,  firstPlatform.height));
-	//AddPlatform(sf::Vector2f(secondPlatform.left, secondPlatform.top), sf::Vector2f(secondPlatform.width, secondPlatform.height));
 
-	
-	std::vector<sf::FloatRect> platforms;
-	platforms.push_back(firstPlatform);
+	platform.setPosition(firstPlatform.left, firstPlatform.top);
 	//platforms.push_back(secondPlatform);
 
-	player = new Player(platforms,*window, playerPos, getNewEntityIndex());
+	player = new Player(firstPlatform,*window, playerPos, getNewEntityIndex());
 
-	//Entity* object = new Platform(sf::Vector2f(50, 50), sf::Vector2f(300, window.getSize().y - 50), window, getNewEntityIndex());
 	entities.push_back(player);
+
+	spawner = std::make_unique<EnemySpawner>(3.f, player, *window);
+
+	if (sf::Shader::isAvailable) {
+		if (!shader.loadFromFile("res/Shader/Shader.txt", sf::Shader::Fragment)) {
+			//error
+			std::cout << "Couldnt open file" << std::endl;
+		}
+		else {
+			shaderShape.setSize(static_cast<sf::Vector2f>(window->getSize()));
+			shader.setUniform("u_resolution", sf::Glsl::Vec2(window->getSize()));
+			shaderAvailable = true;
+		}
+	}
+
 
 } 
 void GameManager::AddPlatform(sf::Vector2f startPos,sf::Vector2f size) {
@@ -128,42 +138,49 @@ void GameManager::AddPlatform(sf::Vector2f startPos,sf::Vector2f size) {
 
 }
 void GameManager::HandleEvent(sf::Event evnt) {
-	 if (evnt.type == sf::Event::KeyPressed) {
+	 if (evnt.type == sf::Event::KeyPressed) { 
 		if (evnt.key.code == sf::Keyboard::F && indexWeapon != -1) {
 			//Pickup the item
 			//items.erase(items.begin() + getItemIndexFromName(itemName));
-			std::cout << "Added into inventory" << droppedWeapons[indexWeapon]->name<< std::endl;
-			droppedWeapons[indexWeapon]->isDropped = false;
-			player->setInventoryItem(false, droppedWeapons[indexWeapon]);
+			droppedWeapons[indexWeapon].weapon->isDropped = false;
+			droppedWeapons[indexWeapon].weapon->playerUsing = true;
+			//if player doesnt have anything in the right inventory then add the weapon to right inventory
+			if (player->rightWeapon == nullptr) {
+				player->setInventoryItem(false, droppedWeapons[indexWeapon].weapon);
+			}
+			else {
+				//otherwise, add the new weapon to the current holding one
+				if (player->holdingLeftWeapon()) {
+					player->setInventoryItem(true, droppedWeapons[indexWeapon].weapon);
+				}
+				else {
+					player->setInventoryItem(false, droppedWeapons[indexWeapon].weapon);
+				}
+			}
+			//player->setInventoryItem(false, droppedWeapons[indexWeapon].weapon);
 			droppedWeapons.erase(droppedWeapons.begin() + indexWeapon);
 		}
-		else if (evnt.key.code == sf::Keyboard::T) {
-			//spawn new item
-			sf::Vector2f mousePos = static_cast<sf::Vector2f>(sf::Mouse::getPosition(*window));
-			//std::string name = "AK-47_" + std::to_string(entityIndex);
-			//Item* item = new Weapon(name, mousePos, sf::Vector2f(10, 10), sf::Vector2f(10, -20), "Weapon/AK-47.png", *window, getNewEntityIndex());
-			//Item* item = new Weapon(Weapon_AK47, mousePos,*window, getNewEntityIndex());
-			//items.push_back(item);
-		}
-		else if (evnt.key.code == sf::Keyboard::Z) {
-			Weapon* w = new Weapon(Weapon_M4, sf::Vector2f(player->getGlobalBounds().left, player->getGlobalBounds().top), true, *window, getNewEntityIndex());
-			player->setInventoryItem(false, w);
-		}
-		else if (evnt.key.code == sf::Keyboard::M) {
-			GameOver();
-		}
 	 }
+	 else if (evnt.type == sf::Event::LostFocus && UI->currPanel == PanelType_MainPanel) {
+		 //UI->setPanel(PanelType_PausePanel);
+		 UI->currPanel = PanelType_PausePanel;
+	 }
+
 }
 void GameManager::Update(float currDelta) {
+	
+	
+	
 	//Update UI
-	//audio->Update();
 	UI->Update(currDelta);
 
 	if (!gameStarted) return;
-
+	audio->Update();
 	if (UI->isPaused()) {
 		return;
 	}
+	//Handle enemy spawning
+	spawner->Update(currDelta);
 	background->Update(sf::Vector2f(player->getGlobalBounds().left, player->getGlobalBounds().top));
 	for (int i = 0; i < entities.size(); i++) {
 		entities[i]->Update(currDelta);
@@ -174,8 +191,13 @@ void GameManager::Update(float currDelta) {
 	for (int i = 0; i < enemies.size(); i++) {
 		enemies[i]->Update(currDelta);
 	}
-	//Handle enemy spawning
-	//spawner->Update(currDelta);
+	for (int i = 0; i < droppedWeapons.size(); i++) {
+		droppedWeapons[i].currDisTime -= currDelta;
+		if (droppedWeapons[i].currDisTime <= 0) {
+			droppedWeapons.erase(droppedWeapons.begin() + i);
+		}
+	}
+	
 	
 	
 }
@@ -238,48 +260,44 @@ void GameManager::FixedUpdate() {
 		if (enemies[i]->toRemove) {
 			currentScore += enemies[i]->score;
 			enemies.erase(enemies.begin() + i);
+			spawner->EnemyKilled();
+
+			if (player->health <= 80 && getRandomInt(0, 100) < 40) {
+				player->health += 20;
+			}
 		}
 	}
+	UI->showPickup = false;
 
-	
-	//Check for item collision
-	/*
-	for (auto& item : items) {
-		if (!item->isInInventory && item->isDropped && Physics::isColliding(player->getGlobalBounds(), item->getPickableZoneBounds())) {
-			std::cout << "Press E to pickup item: "<<item->name << std::endl;
-			itemName = item->name;
-		}
-		else {
-			itemName = "";
-		}
-		item->FixedUpdate();
-	}*/
 	for (int i = 0; i < droppedWeapons.size(); i++){
-		if (Physics::isColliding(player->getGlobalBounds(), droppedWeapons[i]->getPickableZoneBounds())) {
-			//std::cout << "Press F to pickup item: " << droppedWeapons[i]->name << std::endl;
+		if (Physics::isColliding(player->getGlobalBounds(), droppedWeapons[i].weapon->getPickableZoneBounds())) {
+			UI->showPickup = true;
+			UI->weaponName = droppedWeapons[i].weapon->name;
+			UI->playerPos = sf::Vector2f(player->getGlobalBounds().left, player->getGlobalBounds().top);
+			
 			indexWeapon = i;
 		}
 		else {
+
 			indexWeapon = -1;
 		}
-		droppedWeapons[i]->FixedUpdate();
+		droppedWeapons[i].weapon->FixedUpdate();
 
-		//TODO Add a function for dropped weapons
-			
+		
 	}
 }
 
 void GameManager::Render() {
-	if (onMainMenu) {
-		UI->Render();
-	}
-
-	if (!gameStarted) return;
-
+	
+	
+	
 	background->Render(*window);
-	for (int i = 0; i < platformTiles.size(); i++) {
-		platformTiles[i]->Render();
-	}
+	window->draw(platform);
+	
+	UI->Render();
+	
+	if (!gameStarted) return;
+	
 	for (int i = 0; i < entities.size(); i++) {
 		entities[i]->Render();
 	}
@@ -293,7 +311,7 @@ void GameManager::Render() {
 		items[i]->Render();
 	}
 	for (int i = 0; i < droppedWeapons.size(); i++) {
-		droppedWeapons[i]->Render();
+		droppedWeapons[i].weapon->Render();
 	}
 	
 	if (showQuadTree) {
@@ -302,6 +320,11 @@ void GameManager::Render() {
 	if (!onMainMenu) {
 		UI->Render();
 	}
+	if (shaderAvailable) {
+		this->window->draw(shaderShape, &shader);
+	}
+	
+	
 }
 int GameManager::getItemIndexFromName(std::string _name)
 {
@@ -321,6 +344,11 @@ void GameManager::addBullet(Bullet* bullet) {
 	bullets.push_back(bullet); 
 }
 void GameManager::addEnemy(Enemy* enemy){
+	if (enemy->type != EnemyType_Explosive) {
+		enemy->currWeapon->audio->setMusicVolume(UI->currMusicVol);
+		enemy->currWeapon->audio->setSFXVolume(UI->currSFXVol);
+	}
+	
 	enemies.push_back(enemy);
 }
 void GameManager::addItem(Item* item){
@@ -359,22 +387,26 @@ void GameManager::getPlayerHealth(int& currHealth, int& maxHealth)
 	currHealth = player->health;
 	maxHealth =  player->maxHealth;
 }
-bool GameManager::getPlayerLeftInventory(short& iconX, short& iconY) {
+bool GameManager::getPlayerLeftInventory(short& iconX, short& iconY,int& ammoAmount) {
 	iconX = player->leftWeapon->iconX;
 	iconY = player->leftWeapon->iconY;
-
+	ammoAmount = player->leftWeapon->getAmmoAmount();
 	if (player->holdingLeftWeapon()) {
 		return true;
 	}
 	return false;
 }
-bool GameManager::getPlayerRightInventory(short& iconX, short& iconY) {
+bool GameManager::getPlayerRightInventory(short& iconX, short& iconY,int& ammoAmount) {
 	if (player->rightWeapon != nullptr) {
 		iconX = player->rightWeapon->iconX;
 		iconY = player->rightWeapon->iconY;
+		ammoAmount = player->rightWeapon->getAmmoAmount();
+
 	}else{
 		iconX = -1;
 		iconY = -1;
+		ammoAmount = -1;
+
 	}
 
 	if (!player->holdingLeftWeapon()) {
@@ -390,64 +422,134 @@ int GameManager::getRandomInt(int min, int max) {
 	return rand() % (max - min + 1) + min;
 }
 void GameManager::RestartGame() {
-	std::cout << "restart";
 	entities.clear();
 	items.clear();
 	bullets.clear();
 	enemies.clear();
 	droppedWeapons.clear();
 
-	player->Reset();
 	entities.push_back(player);
+
+	currentScore = 0;
+
+	player->Reset();
 
 	spawner->Reset();
 
 	UI->Restart();
 	UI->setPanel(PanelType_MainPanel);
 }
+void GameManager::Encrypt(std::string& data, std::string key)
+{
+	for (unsigned i = 0; i < data.size(); i++)
+		data[i] ^= key[i % key.size()];
+}
+
+void GameManager::Decrypt(std::string& data, std::string key)
+{
+	for (unsigned i = 0; i < data.size(); i++)
+		data[i] ^= key[i % key.size()];
+}
+
+
+
+void GameManager::setBackground(short index)
+{
+	background->removeLayers();
+	background->addLayer(("res/city " + std::to_string(index) + "/1.png"), 0.4f);
+	background->addLayer(("res/city " + std::to_string(index) + "/2.png"), 0.3f);
+	background->addLayer(("res/city " + std::to_string(index) + "/3.png"), 0.2f);
+	background->addLayer(("res/city " + std::to_string(index) + "/4.png"), 0.1f);
+	background->addLayer(("res/city " + std::to_string(index) + "/5.png"), 0.0f);
+}
+
+void GameManager::saveBackground(short index)
+{
+	std::fstream file;
+	file.open("data.txt");
+
+	std::ofstream temp;
+	temp.open("temp2.txt", std::ios::trunc);
+
+	temp << std::to_string(index);
+
+	temp.close();
+	file.close();
+	remove("data.txt");
+	rename("temp2.txt", "data.txt");
+}
+
+void GameManager::setMusicVolume(int vol)
+{
+	audio->setMusicVolume(vol);
+	
+	for (int i = 0; i < enemies.size(); i++) {
+		if (enemies[i]->type != EnemyType_Explosive) {
+			enemies[i]->currWeapon->audio->setMusicVolume(vol);
+		}
+	}
+	player->usingWeapon->audio->setMusicVolume(vol);
+}
+
+void GameManager::setSFXVolume(int vol)
+{
+	audio->setSFXVolume(vol);
+	for (int i = 0; i < enemies.size(); i++) {
+		if (enemies[i]->type != EnemyType_Explosive) {
+			enemies[i]->currWeapon->audio->setSFXVolume(vol);
+		}
+	}
+	player->usingWeapon->audio->setSFXVolume(vol);
+}
 
 void GameManager::GameOver()
 {
+	
+	audio->playCustomMusic("res/Audio/Music/Defeated (Game Over Tune).ogg", false);
 
+	UI->currPanel = PanelType_GameOverPanel;
+
+	std::string key = "YES";
 	std::fstream file;
 	file.open("save.txt");
 	std::string line;
-
+	//get the encrypted line
 	std::getline(file, line);
-	int shiftNum = std::stoi(line);
-	std::getline(file, line);
-	long encHighScore = std::stoi(line);
+	std::string data = line;
 
-	//std::cout << "DEC: " << (highScore >> shiftNum) << std::endl;
-	//Delete previous line and insert new highscore
-	if (currentScore >= (encHighScore >> shiftNum)) {
+	int decHighScore = 0;
+	//If its the first time saving, there isnt anything to decrypt
+	if (line != "") {
+
+		Decrypt(data, key);
+
+		decHighScore = std::stoi(data);
+	}
+	
+
+	if (currentScore > decHighScore) {
 		std::ofstream temp;
 		temp.open("temp.txt", std::ios::trunc);
-		short shiftNum = getRandomInt(1, 255);
-		
-		while ((currentScore << shiftNum) <= 0 ) {
-			shiftNum = getRandomInt(1, 255);
-		}
 
-		//std::cout << "SHIFT NUM: " << shiftNum << std::endl;
-		//std::cout << "ENC: " << (currentScore << shiftNum) << std::endl;
-		temp << std::to_string(shiftNum) + "\n";
-		temp << std::to_string(currentScore << shiftNum);
+		data = std::to_string(currentScore);
+		Encrypt(data, key);
+		//temp << std::to_string(shiftNum) + "\n";
+		temp << data;
 
 		temp.close();
 		file.close();
 		remove("save.txt");
-		
+
 		if (rename("temp.txt", "save.txt") != 0)
 			std::cout << "Error renaming file \n";
 
 		UI->highscore = currentScore;
 	}
 	else {
-		UI->highscore = (encHighScore >> shiftNum);
+		UI->highscore = decHighScore;
 	}
-	
-	UI->currPanel = PanelType_GameOverPanel;
+	UI->score = currentScore;
+
 }
 
 int GameManager::getCurrentScore()
@@ -462,9 +564,21 @@ void GameManager::setVSync(bool set)
 
 void GameManager::startGame()
 {
+	audio->stopCustomMusic();
 	gameStarted = true;
 	onMainMenu = false;
+	audio->playMusic("1");
 	UI->setPanel(PanelType_MainPanel);
+}
+void GameManager::quitGame()
+{
+	audio->playCustomMusic("res/Audio/Music/SkyFire (Title Screen) (1).ogg", true);
+
+	gameStarted = false;
+	onMainMenu = true;
+	RestartGame();
+	UI->currPanel = PanelType_MainMenuPanel;
+
 }
 
 

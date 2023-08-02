@@ -16,7 +16,7 @@ void EnemySpawner::Update(float dt)
 	elapsedTime += dt;
     totalSurvivalTime += dt;
 	if (currAmount < maxAmount && elapsedTime >= spawnerTime) {
-        // Reset elapsedTime
+        //Reset elapsedTime
         elapsedTime = 0.f;
         currAmount++;
 
@@ -55,7 +55,6 @@ void EnemySpawner::Update(float dt)
                 break;
             }
         }
-
         // Spawn a new enemy with the chosen type
         Enemy* enemy = new Enemy(static_cast<EnemyType>(chosenType), player, sf::Vector2f(rand() % window->getSize().x, 0), *window, GameManager::getInstance().getNewEntityIndex());
         GameManager::getInstance().addEnemy(enemy);
@@ -65,4 +64,11 @@ void EnemySpawner::Update(float dt)
 void EnemySpawner::Reset()
 {
     totalSurvivalTime = 0.f;
+    currAmount = 0;
+    elapsedTime = 0;
+}
+
+void EnemySpawner::EnemyKilled()
+{
+    currAmount--;
 }

@@ -2,7 +2,7 @@
 ParallaxEffect::ParallaxEffect(int layers) {
 	maxLayers = layers;
 }
-void ParallaxEffect::addLayer(std::string fileName, float effect, sf::Vector2f playerPos)
+void ParallaxEffect::addLayer(std::string fileName, float effect)
 {
 	
 	float tempEff = std::clamp(effect, 0.f, 1.f);
@@ -52,4 +52,12 @@ void ParallaxEffect::Render(sf::RenderWindow& window)
 		sprites[i].setTexture(textures[i]);
 		window.draw(sprites[i]);
 	}
+}
+
+void ParallaxEffect::removeLayers()
+{
+	textures.clear();
+	sprites.clear();
+	isFirstLayer = true;
+
 }

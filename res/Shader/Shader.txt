@@ -1,0 +1,37 @@
+
+#ifdef GL_ES
+precision mediump float;
+#endif
+
+uniform vec2 u_resolution;
+
+
+float vignette(vec2 st){
+    st *=  1.0 - st;
+    
+    float vig = st.x * 1.5 * st.y * 2. ;
+    vig = pow(vig,1.);
+    return vig;
+}
+void main() {
+    /*
+    vec2 st = gl_FragCoord.xy/u_resolution.xy;
+    //st.x *= u_resolution.x/u_resolution.y;
+ 	
+   	float vig = vignette(st) * 1.5;
+
+    gl_FragColor = vec4(1.,1.,1.,vig);*/
+
+    vec2 uv = gl_FragCoord.xy/u_resolution.xy;
+   
+    uv *=  1.0 - uv.yx;   //vec2(1.0)- uv.yx; -> 1.-u.yx; Thanks FabriceNeyret !
+    
+    float vig = uv.x*uv.y * 5; // multiply with sth for intensity
+    
+    vig = pow(vig, 1.5f); // change pow for modifying the extend of the  vignette
+
+    
+    gl_FragColor = vec4(1,1,1,vig); 
+}
+
+
